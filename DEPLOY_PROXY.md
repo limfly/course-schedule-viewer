@@ -56,7 +56,21 @@ module.exports = async (req, res) => {
 2) 部署步骤（Vercel）
 - 在 Vercel 控制台新建项目，连接你的 GitHub 仓库。
 - 在项目设置 -> Environment Variables 中添加 `AI_API_KEY`，值设置为你的 key（例如：450ac398... 但请务必使用你自己的并保密）。
+ - 在项目设置 -> Environment Variables 中添加 `AI_API_KEY`，值设置为你的 key（请务必保密）。
+ - 如果使用 BigModel（国内型号），请设置：
+   - `AI_API_URL` = `https://open.bigmodel.cn/api/paas/v4/chat/completions`
+   - `AI_API_KEY_HEADER` = `Authorization`（通常为默认）
+   - `AI_MODEL` = `gpt-3.5-mini` 或你选择的可用模型
 - 推送并部署，Vercel 会自动部署 `api/*` 下的 serverless 函数。
+
+示例：在本地使用 PowerShell 设置临时环境变量并运行（仅用于本地测试，部署时请在 Vercel/Netlify 控制台中设置）：
+
+```powershell
+$env:AI_API_KEY = '你的_key_这里'
+$env:AI_API_URL = 'https://open.bigmodel.cn/api/paas/v4/chat/completions'
+# 然后本地启动一个静态服务器或用 vercel dev 运行本地测试
+vercel dev
+```
 
 3) 前端配置
 - 在 `app.js` 中设置 `AI_PROXY_URL` 为你的 Vercel 部署域名（例如 `https://your-app.vercel.app`）。
