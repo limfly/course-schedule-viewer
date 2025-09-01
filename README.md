@@ -148,8 +148,8 @@ http://localhost:8000
 ## 📞 联系方式
 
 如有问题或建议，请通过以下方式联系：
-- 提交 [Issue](https://github.com/你的用户名/course-schedule-viewer/issues)
-- 发送邮件至：your-email@example.com
+- 提交 [Issue](https://github.com/limfly/course-schedule-viewer/issues)
+- 发送邮件至：1612128007@qq.com
 
 ---
 
