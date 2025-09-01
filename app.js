@@ -6,6 +6,9 @@ let currentView = 'day'; // 'day' 或 'week'
 let coursesData = []; // 将改为动态数据
 let currentScheduleId = 'default'; // 当前使用的课表ID
 let importHistory = []; // 导入历史
+// 可配置的后端代理 URL（留空则不使用代理）
+// 推荐部署一个 serverless 代理（Vercel/Netlify/Cloudflare Worker），代理中保存 AI_KEY
+const AI_PROXY_URL = '';
 
 // DOM元素
 const elements = {
@@ -40,6 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
     displayWeekSchedule(currentWeek);
     setupEventListeners();
     setupImportHandlers();
+    loadProxyUrlFromStorage();
 });
 
 // 加载课表数据
@@ -182,8 +186,25 @@ async function handleFile(file) {
     
     try {
         const data = await readExcelFile(file);
-        const parseResult = parseScheduleData(data, file.name);
-        
+        let parseResult = parseScheduleData(data, file.name);
+
+        // 如果本地解析失败或置信度较低，且配置了 AI 代理，则回退到代理解析
+        if ((!parseResult.success || (parseResult.confidence || 0) < 50) && AI_PROXY_URL) {
+            showImportStatus('本地解析置信度较低，正在使用后端 AI 代理解析...', 'info');
+            try {
+                const proxyResult = await parseUsingAiProxy(data, file.name);
+                if (proxyResult && proxyResult.success) {
+                    parseResult = proxyResult;
+                } else {
+                    // 保留原有解析结果并显示代理错误
+                    showImportStatus('代理解析失败，已保留本地解析结果。', 'warning');
+                }
+            } catch (err) {
+                console.error('代理解析失败', err);
+                showImportStatus('代理解析失败：' + err.message, 'error');
+            }
+        }
+
         if (parseResult.success) {
             pendingImportData = parseResult;
             showPreview(parseResult);
@@ -197,6 +218,34 @@ async function handleFile(file) {
         console.error('处理文件失败', error);
         showImportStatus('文件处理失败：' + error.message, 'error');
     }
+}
+
+
+// 使用后端 AI 代理解析（前端将原始表格数据传给后端，后端调用 AI 并返回解析好的 JSON）
+async function parseUsingAiProxy(excelData, fileName) {
+    if (!AI_PROXY_URL) throw new Error('未配置 AI_PROXY_URL');
+
+    // 只取前 500 行以控制大小（后端可按需调整）
+    const rows = excelData.data.slice(0, 500).map(r => r.map(c => (c === undefined || c === null ? '' : String(c))));
+
+    const payload = {
+        fileName: fileName,
+        rows: rows
+    };
+
+    const resp = await fetch(AI_PROXY_URL + '/parse-excel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+
+    if (!resp.ok) {
+        const text = await resp.text();
+        throw new Error(`代理返回错误: ${resp.status} ${text}`);
+    }
+
+    const data = await resp.json();
+    return data;
 }
 
 // 读取Excel文件
@@ -875,6 +924,30 @@ function setupEventListeners() {
         displayWeekView(currentWeek);
     });
 }
+
+// 代理 URL 存储与 UI
+function loadProxyUrlFromStorage(){
+    try{
+        const url = localStorage.getItem('AI_PROXY_URL') || '';
+        if(url){
+            document.getElementById('proxy-url-input').value = url;
+            // 更新运行时变量
+            window.AI_PROXY_URL = url;
+        }
+    }catch(e){console.error(e)}
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+    const btn = document.getElementById('save-proxy-btn');
+    if(btn){
+        btn.addEventListener('click', ()=>{
+            const url = document.getElementById('proxy-url-input').value.trim();
+            localStorage.setItem('AI_PROXY_URL', url);
+            window.AI_PROXY_URL = url;
+            showMessage('已保存代理 URL（仅保存在本地浏览器）', 'success');
+        });
+    }
+});
 
 // 显示指定周的课表
 function displayWeekSchedule(week) {
