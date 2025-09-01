@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>课表查看器</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <div class="header">
+            <h1>课表查看器</h1>
+            <div class="controls">
+                <button id="prevWeek">上一周</button>
+                <span id="currentWeek"></span>
+                <button id="nextWeek">下一周</button>
+            </div>
+        </div>
+        <div id="schedule-container">
+            <table id="schedule">
+                <thead>
+                    <tr>
+                        <th>时间</th>
+                        <th>周一</th>
+                        <th>周二</th>
+                        <th>周三</th>
+                        <th>周四</th>
+                        <th>周五</th>
+                        <th>周六</th>
+                        <th>周日</th>
+                    </tr>
+                </thead>
+                <tbody id="scheduleBody">
+                    <!-- 课表内容将由JavaScript动态生成 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="courses_data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
