@@ -6,11 +6,18 @@ let config = {
     totalWeeks: 20,
     startWeek: 1,
     timeSlots: [
-        {id: 1, name: "第一节", startTime: "08:00", endTime: "09:40"},
-        {id: 2, name: "第二节", startTime: "10:00", endTime: "11:40"},
-        {id: 3, name: "第三节", startTime: "14:00", endTime: "15:40"},
-        {id: 4, name: "第四节", startTime: "16:00", endTime: "17:40"},
-        {id: 5, name: "第五节", startTime: "19:00", endTime: "20:40"}
+        {id: 1, name: "第一节", startTime: "08:30", endTime: "09:15"},
+        {id: 2, name: "第二节", startTime: "09:25", endTime: "10:10"},
+        {id: 3, name: "第三节", startTime: "10:30", endTime: "11:15"},
+        {id: 4, name: "第四节", startTime: "11:25", endTime: "12:10"},
+        {id: 5, name: "第五节", startTime: "13:30", endTime: "14:15"},
+        {id: 6, name: "第六节", startTime: "14:25", endTime: "15:10"},
+        {id: 7, name: "第七节", startTime: "15:20", endTime: "16:05"},
+        {id: 8, name: "第八节", startTime: "16:25", endTime: "17:10"},
+        {id: 9, name: "第九节", startTime: "17:20", endTime: "18:05"},
+        {id: 10, name: "第十节", startTime: "19:00", endTime: "19:45"},
+        {id: 11, name: "第十一节", startTime: "19:55", endTime: "20:40"},
+        {id: 12, name: "第十二节", startTime: "20:50", endTime: "21:35"}
     ]
 };
 
