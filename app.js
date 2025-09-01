@@ -250,17 +250,28 @@ function parseScheduleData(excelData, fileName) {
         return result;
     }
     
+    // 首先确定文件结构并预处理数据
+    const structureInfo = determineFileStructure(excelData.data);
+    const processedData = structureInfo.processedData;
+    
     // 智能检测列标题位置
-    const headerInfo = detectHeaders(excelData.data);
+    const headerInfo = detectHeaders(processedData, structureInfo.skipRows);
     
     if (!headerInfo.found) {
         result.message = '无法识别课表格式，请确保文件包含必要的列标题';
         result.errors = headerInfo.errors || ['未找到有效的列标题'];
+        
+        // 添加调试信息
+        result.errors.push(`文件结构信息: 跳过行数=${structureInfo.skipRows}, 数据行数=${processedData.length}`);
+        if (processedData.length > 0) {
+            result.errors.push(`前3行数据预览: ${JSON.stringify(processedData.slice(0, 3))}`);
+        }
+        
         return result;
     }
     
     // 解析数据
-    const parseResult = parseDataRows(excelData.data, headerInfo);
+    const parseResult = parseDataRows(processedData, headerInfo);
     
     result.courses = parseResult.courses;
     result.errors = parseResult.errors;
@@ -277,8 +288,55 @@ function parseScheduleData(excelData, fileName) {
     return result;
 }
 
+// 确定文件结构并预处理数据
+function determineFileStructure(rawData) {
+    if (!rawData || rawData.length === 0) {
+        return {
+            processedData: rawData,
+            skipRows: 0,
+            notes: ['文件为空']
+        };
+    }
+    
+    let processedData = [...rawData];
+    let skipRows = 0;
+    const notes = [];
+    
+    // 检查第一行是否为"课表"标题行
+    if (rawData.length > 0 && rawData[0]) {
+        const firstRow = rawData[0];
+        const titleCount = firstRow.filter(cell => 
+            String(cell || '').trim().toLowerCase().includes('课表') ||
+            String(cell || '').trim().toLowerCase().includes('schedule')
+        ).length;
+        
+        // 如果第一行大部分是"课表"，认为是标题行
+        if (titleCount >= firstRow.length / 2 && titleCount > 0) {
+            processedData = rawData.slice(1); // 跳过标题行
+            skipRows = 1;
+            notes.push(`跳过标题行，检测到 ${titleCount} 个"课表"单元格`);
+        }
+    }
+    
+    // 检查处理后的第一行是否全为空
+    if (processedData.length > 0 && processedData[0]) {
+        const hasData = processedData[0].some(cell => cell && String(cell).trim());
+        if (!hasData) {
+            processedData = processedData.slice(1);
+            skipRows++;
+            notes.push('跳过空行');
+        }
+    }
+    
+    return {
+        processedData: processedData,
+        skipRows: skipRows,
+        notes: notes
+    };
+}
+
 // 检测列标题
-function detectHeaders(data) {
+function detectHeaders(data, skipRows = 0) {
     const headerPatterns = {
         courseName: ['课程名称', '课程', '科目', '课程名', '学科', 'course', 'subject'],
         classId: ['教学班号', '班号', '教学班', '班级号', '班级', 'class', 'class_id'],
@@ -294,18 +352,26 @@ function detectHeaders(data) {
         
         const mapping = {};
         let matchCount = 0;
+        const debugInfo = [];
         
         // 检查每个单元格是否匹配已知的列标题
         for (let colIndex = 0; colIndex < row.length; colIndex++) {
-            const cellValue = String(row[colIndex] || '').trim().toLowerCase();
+            const cellValue = String(row[colIndex] || '').trim();
             if (!cellValue) continue;
+            
+            const cellValueLower = cellValue.toLowerCase();
+            debugInfo.push(`列${colIndex}: "${cellValue}"`);
             
             for (const [field, patterns] of Object.entries(headerPatterns)) {
                 for (const pattern of patterns) {
-                    if (cellValue.includes(pattern.toLowerCase())) {
-                        mapping[field] = colIndex;
-                        matchCount++;
-                        break;
+                    // 完全匹配或包含匹配
+                    if (cellValueLower === pattern.toLowerCase() || cellValueLower.includes(pattern.toLowerCase())) {
+                        if (!mapping[field]) { // 避免重复匹配
+                            mapping[field] = colIndex;
+                            matchCount++;
+                            debugInfo[debugInfo.length - 1] += ` -> 匹配${field}(${pattern})`;
+                            break;
+                        }
                     }
                 }
                 if (mapping[field] !== undefined) break;
@@ -315,6 +381,8 @@ function detectHeaders(data) {
         // 如果找到至少3个必要字段，认为找到了标题行
         if (matchCount >= 3 && mapping.courseName !== undefined && mapping.time !== undefined) {
             const confidence = (matchCount / 5) * 100;
+            console.log(`找到标题行(行${rowIndex}):`, debugInfo);
+            console.log('列映射:', mapping);
             return {
                 found: true,
                 headerRow: rowIndex,
@@ -325,9 +393,16 @@ function detectHeaders(data) {
         }
     }
     
+    // 如果没找到，返回详细的调试信息
+    const debugData = data.slice(0, 3).map((row, i) => `行${i}: ${row.map(cell => `"${cell}"`).join(', ')}`);
+    
     return {
         found: false,
-        errors: ['无法识别列标题，请确保文件包含：课程名称、上课时间等必要信息']
+        errors: [
+            '无法识别列标题，请确保文件包含：课程名称、上课时间等必要信息',
+            `已跳过${skipRows}行`,
+            `前3行数据: ${debugData.join(' | ')}`
+        ]
     };
 }
 
