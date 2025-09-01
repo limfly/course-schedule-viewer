@@ -345,8 +345,9 @@ function detectHeaders(data, skipRows = 0) {
         teacher: ['上课教师', '教师', '老师', '任课教师', '授课教师', 'teacher', 'instructor']
     };
     
-    // 尝试在前5行查找标题行
-    for (let rowIndex = 0; rowIndex < Math.min(5, data.length); rowIndex++) {
+    // 尝试在前若干行查找标题行（扩大搜索范围以适应不同导出格式）
+    const maxSearchRows = Math.min(20, data.length);
+    for (let rowIndex = 0; rowIndex < maxSearchRows; rowIndex++) {
         const row = data[rowIndex];
         if (!row || row.length < 3) continue;
         
@@ -378,9 +379,9 @@ function detectHeaders(data, skipRows = 0) {
             }
         }
         
-        // 如果找到至少3个必要字段，认为找到了标题行
-        if (matchCount >= 3 && mapping.courseName !== undefined && mapping.time !== undefined) {
-            const confidence = (matchCount / 5) * 100;
+        // 如果找到足够的字段，认为找到了标题行（课程名与时间字段为必须）
+        if (mapping.courseName !== undefined && mapping.time !== undefined && matchCount >= 2) {
+            const confidence = Math.min(100, (matchCount / 5) * 100 + 20);
             console.log(`找到标题行(行${rowIndex}):`, debugInfo);
             console.log('列映射:', mapping);
             return {
@@ -392,16 +393,43 @@ function detectHeaders(data, skipRows = 0) {
             };
         }
     }
-    
-    // 如果没找到，返回详细的调试信息
-    const debugData = data.slice(0, 3).map((row, i) => `行${i}: ${row.map(cell => `"${cell}"`).join(', ')}`);
-    
+    // 回退策略：若在较前行未能找到明确标题，但数据行较为规则，尝试使用第一行或第一行非空行作为列标题（保守映射）
+    for (let rowIndex = 0; rowIndex < Math.min(8, data.length); rowIndex++) {
+        const row = data[rowIndex];
+        if (!row) continue;
+        const nonEmpty = row.filter(c => c !== undefined && c !== null && String(c).trim() !== '');
+        if (nonEmpty.length >= 3) {
+            // 如果行长度 >=5 则按前5列做保守映射
+            if (row.length >= 5) {
+                const mapping = {
+                    courseName: 0,
+                    classId: 1,
+                    time: 2,
+                    location: 3,
+                    teacher: 4
+                };
+                const confidence = 40;
+                console.log(`回退使用第${rowIndex}行作为列映射（保守映射）`);
+                return {
+                    found: true,
+                    headerRow: rowIndex,
+                    dataStartRow: rowIndex + 1,
+                    mapping: mapping,
+                    confidence: confidence
+                };
+            }
+        }
+    }
+
+    // 如果仍然没找到，返回详细的调试信息
+    const debugData = data.slice(0, Math.min(5, data.length)).map((row, i) => `行${i}: ${row.map(cell => `"${cell}"`).join(', ')}`);
+
     return {
         found: false,
         errors: [
             '无法识别列标题，请确保文件包含：课程名称、上课时间等必要信息',
             `已跳过${skipRows}行`,
-            `前3行数据: ${debugData.join(' | ')}`
+            `前几行数据: ${debugData.join(' | ')}`
         ]
     };
 }
@@ -488,48 +516,54 @@ function extractCourseFromRow(row, mapping, rowIndex) {
 // 解析时间字符串
 function parseTimeString(timeStr) {
     const results = [];
-    
-    // 移除多余空格
-    timeStr = timeStr.replace(/\s+/g, '');
-    
-    // 匹配模式：如 "1-16周星期一3-4节"
-    const pattern = /(\d+(?:-\d+)?(?:,\d+(?:-\d+)?)*)周?(?:星期|周)([一二三四五六日])(\d+-?\d*)节?/g;
-    
+
+    if (!timeStr || typeof timeStr !== 'string') return results;
+
+    // 统一字符：全角转半角，去掉空格
+    timeStr = timeStr.replace(/[　]/g, ' ').replace(/\s+/g, '');
+    timeStr = timeStr.replace(/－/g, '-').replace(/，/g, ',');
+
+    // 常见模式：1-16周星期一3-4节 或 1-4,6-17周星期一6-7节
+    const mainPattern = /(\d+(?:-\d+)?(?:,\d+(?:-\d+)?)*)周(?:星期)?([一二三四五六日天])?(\d+(?:-\d+)?(?:,\d+(?:-\d+)?)*)?节?/g;
+
     let match;
-    while ((match = pattern.exec(timeStr)) !== null) {
-        const weeksStr = match[1];
-        const weekday = match[2];
-        const periods = match[3] + '节';
-        
+    while ((match = mainPattern.exec(timeStr)) !== null) {
+        const weeksStr = match[1] || '';
+        const weekday = match[2] || '';
+        const periodsStr = match[3] || '';
+
         const weeks = parseWeeks(weeksStr);
-        
+        const periods = periodsStr ? (periodsStr + '节') : '';
+
         if (weeks.length > 0) {
-            results.push({
-                weeks: weeks,
-                weekday: weekday,
-                periods: periods
-            });
+            results.push({ weeks, weekday, periods });
         }
     }
-    
-    // 如果没有匹配到标准格式，尝试其他格式
+
+    // 如果没有任何结果，尝试只匹配单纯的周次如 "10周" 或 "8周星期六6-9节"（无'星期'关键字）
     if (results.length === 0) {
-        // 尝试匹配简单的周次，如 "10周"
-        const simpleWeekPattern = /(\d+(?:-\d+)?(?:,\d+(?:-\d+)?)*)周/;
-        const simpleMatch = timeStr.match(simpleWeekPattern);
-        
-        if (simpleMatch) {
-            const weeks = parseWeeks(simpleMatch[1]);
-            if (weeks.length > 0) {
-                results.push({
-                    weeks: weeks,
-                    weekday: '',
-                    periods: ''
-                });
+        // 尝试匹配如 "10周" 或 "1-4,6-17周"
+        const onlyWeek = timeStr.match(/(\d+(?:-\d+)?(?:,\d+(?:-\d+)?)*)周/);
+        if (onlyWeek) {
+            const weeks = parseWeeks(onlyWeek[1]);
+            if (weeks.length > 0) results.push({ weeks, weekday: '', periods: '' });
+        }
+
+        // 尝试匹配包含星期但没有周字的情况，例如 "8周星期六6-9节" 或 "8星期六6-9节"
+        const altPattern = /(\d+(?:-\d+)?(?:,\d+(?:-\d+)?)*)?(?:周)?(?:星期)?([一二三四五六日天])(\d+(?:-\d+)?(?:,\d+(?:-\d+)?)*)?节?/;
+        const altMatch = timeStr.match(altPattern);
+        if (altMatch) {
+            const weeksStr = altMatch[1] || '';
+            const weekday = altMatch[2] || '';
+            const periodsStr = altMatch[3] || '';
+            const weeks = weeksStr ? parseWeeks(weeksStr) : [];
+            const periods = periodsStr ? (periodsStr + '节') : '';
+            if (weeks.length > 0 || weekday) {
+                results.push({ weeks, weekday, periods });
             }
         }
     }
-    
+
     return results;
 }
 
