@@ -72,6 +72,41 @@ $env:AI_API_URL = 'https://open.bigmodel.cn/api/paas/v4/chat/completions'
 vercel dev
 ```
 
+Vercel CLI 快速部署步骤（免费层适用）
+
+1. 安装 Vercel CLI：
+
+```powershell
+npm i -g vercel
+```
+
+2. 登录并初始化项目（在仓库根目录执行）：
+
+```powershell
+vercel login
+vercel init
+```
+
+3. 设置环境变量（请不要把 key 写到代码中）：
+
+```powershell
+vercel env add AI_API_KEY production
+vercel env add AI_API_URL production
+vercel env add AI_API_KEY_HEADER production
+vercel env add AI_MODEL production
+```
+
+会提示你粘贴对应值。也可以在 Vercel 控制台的 Project -> Settings -> Environment Variables 手动添加。
+
+4. 部署：
+
+```powershell
+vercel --prod
+```
+
+部署完成后，复制你的域名并填入前端设置中的代理 URL（`AI_PROXY_URL`）。
+
+
 3) 前端配置
 - 在 `app.js` 中设置 `AI_PROXY_URL` 为你的 Vercel 部署域名（例如 `https://your-app.vercel.app`）。
 - 导入流程中会自动调用 `POST ${AI_PROXY_URL}/api/parse-excel`。

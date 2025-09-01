@@ -1,0 +1,14 @@
+{
+  "name": "course-schedule-viewer",
+  "version": "2.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node express-wrapper.js",
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.7",
+    "formidable": "^2.1.1",
+    "express": "^4.18.2"
+  }
+}
