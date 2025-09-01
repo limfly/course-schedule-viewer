@@ -24,7 +24,7 @@
 
 ## 🖥️ 在线访问
 
-访问地址：[https://limfly.github.io/course-schedule-viewer/](https://你的用户名.github.io/course-schedule-viewer/)
+访问地址：[https://limfly.github.io/course-schedule-viewer/](https://limfly.github.io/course-schedule-viewer/)
 
 ## 📖 使用指南
 
@@ -87,7 +87,7 @@
 
 1. 克隆仓库
 ```bash
-git clone https://github.com/你的用户名/course-schedule-viewer.git
+git clone https://github.com/limfly/course-schedule-viewer.git
 cd course-schedule-viewer
 ```
 
