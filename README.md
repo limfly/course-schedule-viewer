@@ -2,7 +2,7 @@
 
 一个完全在浏览器端运行的智能课表管理系统，无需任何后端服务器或本地环境配置。支持Excel文件导入、智能格式识别、多视图展示等功能。
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen)](https://你的用户名.github.io/course-schedule-viewer/)
+[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen)](https://your-username.github.io/course-schedule-viewer/)
 [![License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 
 ## ✨ 特性
@@ -23,7 +23,7 @@
 
 ## 🖥️ 在线访问
 
-访问地址：[https://你的用户名.github.io/course-schedule-viewer/](https://你的用户名.github.io/course-schedule-viewer/)
+访问地址：[https://your-username.github.io/course-schedule-viewer/](https://your-username.github.io/course-schedule-viewer/)
 
 ## 📖 使用指南
 
@@ -86,7 +86,7 @@
 
 1. 克隆仓库
 ```bash
-git clone https://github.com/你的用户名/course-schedule-viewer.git
+git clone https://github.com/your-username/course-schedule-viewer.git
 cd course-schedule-viewer
 ```
 
@@ -147,7 +147,7 @@ http://localhost:8000
 ## 📞 联系方式
 
 如有问题或建议，请通过以下方式联系：
-- 提交 [Issue](https://github.com/你的用户名/course-schedule-viewer/issues)
+- 提交 [Issue](https://github.com/your-username/course-schedule-viewer/issues)
 - 发送邮件至：your-email@example.com
 
 ---

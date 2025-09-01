@@ -40,3 +40,7 @@ create_excel.py
 enhanced_course_viewer.py
 course_format_detector.py
 生成网页数据.py
+
+# 包含个人信息的文件
+课表.xlsx
+课表查看器.py
