@@ -26,16 +26,16 @@ const closeBtn = document.querySelector('.close-btn');
 
 // 事件监听器
 settingsBtn.addEventListener('click', () => {
-    settingsModal.classList.remove('hidden');
+    settingsModal.classList.add('visible');
 });
 
 closeBtn.addEventListener('click', () => {
-    settingsModal.classList.add('hidden');
+    settingsModal.classList.remove('visible');
 });
 
 window.addEventListener('click', (event) => {
     if (event.target == settingsModal) {
-        settingsModal.classList.add('hidden');
+        settingsModal.classList.remove('visible');
     }
 });
 
