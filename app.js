@@ -339,12 +339,27 @@ function deleteTimeSlot(index) {
     initializeTimeSlots();
 }
 
+// 清除课程数据
+function clearCoursesData() {
+    coursesData = [];
+    localStorage.removeItem('coursesData');
+    updateSchedule();
+    console.log('课程数据已清除');
+}
+
 // 处理Excel文件导入
 async function handleExcelImport(file) {
+    // 显示导入进度提示
+    const importPreview = document.getElementById('import-preview');
+    importPreview.innerHTML = '<div class="loading">正在导入课表...</div>';
+    
     const formData = new FormData();
     formData.append('file', file);
     
     try {
+        // 先清除现有数据
+        clearCoursesData();
+        
         const response = await fetch('/api/parse-excel', {
             method: 'POST',
             body: formData
@@ -358,14 +373,35 @@ async function handleExcelImport(file) {
             localStorage.setItem('coursesData', JSON.stringify(coursesData));
             // 更新显示
             updateSchedule();
-            // 关闭设置模态框
-            settingsModal.classList.remove('visible');
+            
+            // 显示导入成功信息
+            importPreview.innerHTML = `
+                <div class="success">
+                    <p>导入成功！共导入 ${result.courses.length} 门课程</p>
+                    <button onclick="clearCoursesData()">清除导入数据</button>
+                </div>
+            `;
         } else {
-            alert('导入失败：' + result.message);
+            importPreview.innerHTML = `
+                <div class="error">
+                    <p>导入失败：${result.message}</p>
+                    <p>请检查Excel文件格式是否符合要求：</p>
+                    <ul>
+                        <li>第一行应为表头：课程名称、教学班号、上课时间、上课地点、上课教师</li>
+                        <li>时间格式示例：12-15周星期五8-9节</li>
+                        <li>确保单元格内容完整且格式正确</li>
+                    </ul>
+                </div>
+            `;
         }
     } catch (error) {
         console.error('导入错误：', error);
-        alert('导入出错，请检查文件格式是否正确');
+        importPreview.innerHTML = `
+            <div class="error">
+                <p>导入出错：${error.message}</p>
+                <p>请检查文件格式是否正确，或稍后重试</p>
+            </div>
+        `;
     }
 }
 
