@@ -1043,7 +1043,11 @@ function displayWeekView(week) {
         '日': '星期日'
     };
     
-    let html = '<div class="week-view-container">';
+    // 如果小屏并且用户期望紧凑视图，则使用 compact-week
+    const isSmall = window.matchMedia && window.matchMedia('(max-width:600px)').matches;
+    const weekContainerClass = isSmall ? 'week-view-container compact-week' : 'week-view-container';
+
+    let html = `<div class="${weekContainerClass}">`;
     
     weekdays.forEach(weekday => {
         const courses = getCoursesForWeekday(week, weekday);
@@ -1060,7 +1064,7 @@ function displayWeekView(week) {
                 <div class="weekday-header">${weekdayNames[weekday]}</div>
                 ${courses.length > 0 ? 
                     courses.map(course => `
-                        <div class="course-card">
+                        <div class="course-card" data-course-id="${encodeURIComponent(course.name + '|' + course.classId + '|' + course.time)}">
                             <div class="course-time">${course.periods || '时间未定'}</div>
                             <div class="course-name">${course.name}</div>
                             <div class="course-details">
@@ -1100,6 +1104,15 @@ function displayWeekView(week) {
     }
 
     elements.coursesDisplay.innerHTML = html;
+
+    // 为每个课程卡片绑定点击事件：点击切换展开/收起（仅在小屏紧凑模式下）
+    if (isSmall) {
+        document.querySelectorAll('.course-card').forEach(card => {
+            card.addEventListener('click', () => {
+                card.classList.toggle('expanded');
+            });
+        });
+    }
 }
 
 // 显示指定星期的课程

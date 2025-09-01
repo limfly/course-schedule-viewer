@@ -692,6 +692,63 @@ body {
     }
 }
 
+/* 紧凑周视图：在小屏上尽量让一周内容可见（收起详情、缩小间距） */
+.week-view-container.compact-week {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.week-view-container.compact-week .weekday-column {
+    padding: 6px;
+    min-height: calc(100vh - 180px); /* 保证可在单屏高度内显示（留出头部/控件空间） */
+    max-height: calc(100vh - 180px);
+    overflow-y: auto;
+    background: #fff;
+    border-radius: 8px;
+}
+
+.week-view-container.compact-week .weekday-header {
+    font-size: 0.9em;
+    text-align: center;
+    padding: 6px 4px;
+    margin-bottom: 8px;
+}
+
+.week-view-container.compact-week .course-card {
+    padding: 6px 8px;
+    margin-bottom: 6px;
+    font-size: 0.86em;
+    border-left-width: 4px;
+    border-radius: 6px;
+}
+
+.week-view-container.compact-week .course-name {
+    font-size: 0.95em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.week-view-container.compact-week .course-details {
+    display: none; /* 默认隐藏详情以节省空间 */
+}
+
+.course-card.expanded .course-details {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.82em;
+}
+
+.course-card .course-time {
+    font-size: 0.88em;
+}
+
+/* 点击提示样式 */
+.course-card { cursor: pointer; }
+
+
 /* 加载状态 */
 .loading {
     text-align: center;
