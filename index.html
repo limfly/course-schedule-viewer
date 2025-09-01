@@ -5,16 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>课表查看器</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Handwriting-like font for mobile labels -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
         <!-- 头部 -->
         <header class="header">
-            <h1>课表查看器</h1>
+            <button class="back-btn" id="back-btn" aria-label="back">‹</button>
+            <h1>课表</h1>
             <div class="header-info">
-                <span id="current-week-info">当前周次：计算中...</span>
-                <button id="set-start-date" class="btn btn-secondary">设置学期开始日期</button>
+                <span id="current-week-info">第 15 周</span>
+                <button id="set-start-date" class="btn btn-secondary">设置</button>
             </div>
+            <button class="top-action" id="top-action" aria-label="action">◯</button>
         </header>
 
         <!-- 设置面板（默认折叠到侧边） -->
