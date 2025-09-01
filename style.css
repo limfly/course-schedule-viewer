@@ -748,6 +748,17 @@ body {
 /* 点击提示样式 */
 .course-card { cursor: pointer; }
 
+/* 小徽章样式用于节次在紧凑模式下展示 */
+.badge-period {
+    display: inline-block;
+    background: linear-gradient(90deg,#4c6ef5,#845ef7);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 0.72em;
+    margin-right: 6px;
+}
+
 
 /* 加载状态 */
 .loading {

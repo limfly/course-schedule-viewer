@@ -38,6 +38,13 @@
                 <button id="import-btn" class="btn btn-primary">导入课表</button>
                 <input type="file" id="file-input" accept=".xlsx,.xls" style="display: none;">
             </div>
+            <div class="view-mode-box" style="display:inline-flex; align-items:center; gap:8px;">
+                <label for="compact-toggle" style="font-size:14px; color:#495057;">移动端视图：</label>
+                <select id="compact-toggle" style="padding:6px 8px; font-size:14px;">
+                    <option value="compact">紧凑一屏</option>
+                    <option value="scroll">卡片滚动</option>
+                </select>
+            </div>
             <div class="proxy-box" style="margin-left:16px; display:inline-block; vertical-align: middle;">
                 <input id="proxy-url-input" type="text" placeholder="代理 URL (例如 https://your-app.vercel.app)" style="width:320px;" />
                 <button id="save-proxy-btn" class="btn btn-secondary">保存代理</button>

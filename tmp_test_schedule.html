@@ -1,92 +1,44 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8">
-  <title>临时课表测试</title>
-  <style>
-    body { font-family: Arial, "Microsoft Yahei", sans-serif; padding: 20px; }
-    .controls { margin-bottom: 12px; }
-    .day { border: 1px solid #ddd; padding: 8px; margin: 6px 0; }
-    .course { padding: 6px; border-bottom: 1px dashed #eee; }
-    .course:last-child { border-bottom: none; }
-    .meta { color: #666; font-size: 12px; }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>课表解析调试</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h2>临时课表测试</h2>
-  <div class="controls">
-    周次: <input id="weekInput" type="number" value="1" min="1" max="30" style="width:60px"> 
-    <button id="showBtn">显示</button>
-    <button id="loadExample">加载示例数据</button>
-  </div>
+    <div style="padding:20px; max-width:900px; margin:0 auto;">
+        <h2>解析调试</h2>
+        <p>在下方粘贴 Excel 行（制表符或逗号分隔），然后点击 <strong>解析</strong> 查看 parseTimeString 结果和最终课程对象示例。</p>
+        <textarea id="debug-input" rows="10" style="width:100%; font-family: monospace;"></textarea>
+        <div style="margin-top:8px; display:flex; gap:8px;">
+            <button id="debug-parse" class="btn btn-primary">解析</button>
+            <button id="debug-clear" class="btn btn-secondary">清除</button>
+        </div>
+        <h3>结果</h3>
+        <pre id="debug-output" style="background:#f8f9fa; padding:12px; border-radius:6px; max-height:400px; overflow:auto;"></pre>
+    </div>
 
-  <div id="result"></div>
-
-  <script src="courses_data.js"></script>
-  <script>
-    // 备用数据（当 coursesData 未定义时使用）
-    const fallback = window.coursesData || [
-      {name:'示例课程',classId:'S001',time:'1-4周星期一1-2节',location:'A101',teacher:'张老师',weeks:[1,2,3,4],weekday:'一',periods:'1-2节'}
-    ];
-
-    function getData(){
-      return window.coursesData && window.coursesData.length ? window.coursesData : fallback;
-    }
-
-    function renderWeek(week){
-      const data = getData();
-      const weekdays = { '一':[], '二':[], '三':[], '四':[], '五':[], '六':[], '日':[] };
-      const other = [];
-      data.forEach(c => {
-        if (Array.isArray(c.weeks) && c.weeks.includes(week)){
-          const wd = c.weekday || '';
-          if (wd && weekdays[wd]) weekdays[wd].push(c);
-          else other.push(c);
-        }
-      });
-
-      const container = document.getElementById('result');
-      container.innerHTML = `<h3>第 ${week} 周（共 ${data.filter(x=>Array.isArray(x.weeks)&&x.weeks.includes(week)).length} 个课程）</h3>`;
-      for (let wd of ['一','二','三','四','五','六','日']){
-        const list = weekdays[wd];
-        const dayDiv = document.createElement('div');
-        dayDiv.className = 'day';
-        dayDiv.innerHTML = `<strong>星期${wd}</strong>` + (list.length?` <span class="meta">共 ${list.length} 门</span>`:' <span class="meta">（无）</span>');
-        if (list.length){
-          list.forEach(c => {
-            const d = document.createElement('div'); d.className='course';
-            d.innerHTML = `<div><strong>${c.name}</strong> <span class="meta">${c.periods}</span></div><div class="meta">${c.location} / ${c.teacher}</div>`;
-            dayDiv.appendChild(d);
-          })
-        }
-        container.appendChild(dayDiv);
-      }
-
-      if (other.length){
-        const dayDiv = document.createElement('div'); dayDiv.className='day';
-        dayDiv.innerHTML = `<strong>未指定星期或不规则项</strong> <span class="meta">共 ${other.length} 项</span>`;
-        other.forEach(c=>{
-          const d = document.createElement('div'); d.className='course';
-          d.innerHTML = `<div><strong>${c.name}</strong> <span class="meta">${c.time}</span></div><div class="meta">${c.location} / ${c.teacher}</div>`;
-          dayDiv.appendChild(d);
-        })
-        container.appendChild(dayDiv);
-      }
-    }
-
-    document.getElementById('showBtn').addEventListener('click', ()=>{
-      const wk = parseInt(document.getElementById('weekInput').value || '1', 10);
-      renderWeek(wk);
+<script src="app.js"></script>
+<script>
+document.getElementById('debug-parse').addEventListener('click', () => {
+    const raw = document.getElementById('debug-input').value.trim();
+    const lines = raw.split(/\n+/).map(l => l.trim()).filter(Boolean);
+    const out = [];
+    lines.forEach(line => {
+        // 尝试按制表或空格或逗号分割为字段
+        const parts = line.split(/\t|\s{2,}|,|，/).map(p => p.trim()).filter(Boolean);
+        const [name, classId, time, location, teacher] = parts;
+        const parsed = parseTimeString(time || '');
+        out.push({raw: line, parts, parsed, course: {name, classId, time, location, teacher}});
     });
+    document.getElementById('debug-output').textContent = JSON.stringify(out, null, 2);
+});
 
-    document.getElementById('loadExample').addEventListener('click', ()=>{
-      window.coursesData = fallback; renderWeek(parseInt(document.getElementById('weekInput').value||'1',10));
-    });
-
-    // 初始渲染
-    document.addEventListener('DOMContentLoaded', ()=>{
-      renderWeek(parseInt(document.getElementById('weekInput').value||'1',10));
-    });
-  </script>
+document.getElementById('debug-clear').addEventListener('click', ()=>{
+    document.getElementById('debug-input').value='';
+    document.getElementById('debug-output').textContent='';
+});
+</script>
 </body>
 </html>

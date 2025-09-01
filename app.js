@@ -43,13 +43,18 @@ document.addEventListener('DOMContentLoaded', function() {
     // 在加载时根据屏幕宽度决定默认视图：小屏幕使用周视图卡片，大屏使用日视图
     try {
         loadProxyUrlFromStorage();
-        const isSmall = window.matchMedia && window.matchMedia('(max-width:600px)').matches;
-        if (isSmall) {
+    const isSmall = window.matchMedia && window.matchMedia('(max-width:600px)').matches;
+    // 加载并应用用户选择的移动视图模式（compact 或 scroll）
+    const savedMode = localStorage.getItem('MOBILE_VIEW_MODE') || 'compact';
+    const compactSelect = document.getElementById('compact-toggle');
+    if (compactSelect) compactSelect.value = savedMode;
+
+    if (isSmall && savedMode === 'compact') {
             currentView = 'week';
             document.getElementById('week-view-btn').classList.add('active');
             document.getElementById('day-view-btn').classList.remove('active');
             document.getElementById('weekday-tabs').style.display = 'none';
-        } else {
+    } else {
             currentView = 'day';
             document.getElementById('day-view-btn').classList.add('active');
             document.getElementById('week-view-btn').classList.remove('active');
@@ -62,7 +67,20 @@ document.addEventListener('DOMContentLoaded', function() {
     displayWeekSchedule(currentWeek);
     setupEventListeners();
     setupImportHandlers();
+    setupMobileViewToggle();
 });
+
+// 绑定移动端视图开关
+function setupMobileViewToggle(){
+    const select = document.getElementById('compact-toggle');
+    if(!select) return;
+    select.addEventListener('change', (e)=>{
+        localStorage.setItem('MOBILE_VIEW_MODE', e.target.value);
+        showMessage('已保存移动端视图偏好', 'success');
+        // 重新渲染当前周
+        displayWeekSchedule(currentWeek);
+    });
+}
 
 // 加载课表数据
 function loadScheduleData() {
