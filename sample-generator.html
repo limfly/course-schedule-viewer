@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>示例课表文件生成器</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f7fa;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .description {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #4c6ef5;
+        }
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        .btn {
+            padding: 12px 24px;
+            background: #4c6ef5;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        .btn:hover {
+            background: #364fc7;
+        }
+        .btn-secondary {
+            background: #868e96;
+        }
+        .btn-secondary:hover {
+            background: #495057;
+        }
+        .format-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .format-table th,
+        .format-table td {
+            border: 1px solid #dee2e6;
+            padding: 12px;
+            text-align: left;
+        }
+        .format-table th {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+        .format-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 示例课表文件生成器</h1>
+        
+        <div class="description">
+            <h3>🎯 使用说明</h3>
+            <p>这个工具可以帮你生成示例课表Excel文件，用于测试课表查看器的导入功能。</p>
+            <ul>
+                <li>点击下面的按钮生成不同类型的示例文件</li>
+                <li>下载后可以直接导入到课表查看器中测试</li>
+                <li>也可以基于示例文件格式制作你自己的课表</li>
+            </ul>
+        </div>
+
+        <div class="button-group">
+            <button class="btn" onclick="generateStandardSchedule()">生成标准课表</button>
+            <button class="btn btn-secondary" onclick="generateSimpleSchedule()">生成简化课表</button>
+            <button class="btn btn-secondary" onclick="generateEnglishSchedule()">生成英文课表</button>
+        </div>
+
+        <div class="description">
+            <h3>📋 支持的文件格式</h3>
+            <table class="format-table">
+                <thead>
+                    <tr>
+                        <th>列名（中文）</th>
+                        <th>列名（英文）</th>
+                        <th>示例内容</th>
+                        <th>是否必需</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>课程名称</td>
+                        <td>Course</td>
+                        <td>高等数学</td>
+                        <td>✅ 是</td>
+                    </tr>
+                    <tr>
+                        <td>上课时间</td>
+                        <td>Time</td>
+                        <td>1-16周星期一3-4节</td>
+                        <td>✅ 是</td>
+                    </tr>
+                    <tr>
+                        <td>上课地点</td>
+                        <td>Location</td>
+                        <td>教学楼A101</td>
+                        <td>❌ 否</td>
+                    </tr>
+                    <tr>
+                        <td>上课教师</td>
+                        <td>Teacher</td>
+                        <td>张教授</td>
+                        <td>❌ 否</td>
+                    </tr>
+                    <tr>
+                        <td>教学班号</td>
+                        <td>Class ID</td>
+                        <td>CS001-01</td>
+                        <td>❌ 否</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="description">
+            <h3>⏰ 时间格式示例</h3>
+            <ul>
+                <li><code>1-16周星期一3-4节</code> - 第1-16周，星期一第3-4节</li>
+                <li><code>1-4,6-17周星期三8-9节</code> - 第1-4周和第6-17周，星期三第8-9节</li>
+                <li><code>12-15周星期五8-9节</code> - 第12-15周，星期五第8-9节</li>
+                <li><code>10周</code> - 第10周（实践课等）</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- SheetJS库 -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    
+    <script>
+        // 生成标准课表示例
+        function generateStandardSchedule() {
+            const data = [
+                ['课程名称', '教学班号', '上课时间', '上课地点', '上课教师'],
+                ['高等数学', 'MATH001-01', '1-16周星期一3-4节', '教学楼A101', '张教授'],
+                ['大学英语', 'ENG001-02', '1-18周星期二1-2节', '外语楼201', '李老师'],
+                ['程序设计基础', 'CS001-01', '1-16周星期三6-7节', '计算机楼301', '王老师'],
+                ['体育', 'PE001-05', '1-18周星期四3-4节', '体育馆', '赵教练'],
+                ['大学物理', 'PHY001-01', '1-16周星期五1-2节', '理学楼202', '孙教授'],
+                ['物理实验', 'PHY001-01E', '2,4,6,8,10,12,14,16周星期五6-8节', '物理实验室', '孙教授'],
+                ['思想政治理论', 'POL001-01', '1-18周星期一8-9节', '人文楼101', '陈老师']
+            ];
+
+            downloadExcel(data, '标准课表示例.xlsx');
+        }
+
+        // 生成简化课表示例
+        function generateSimpleSchedule() {
+            const data = [
+                ['课程', '时间', '地点', '教师'],
+                ['数学', '1-16周星期一1-2节', 'A101', '张老师'],
+                ['英语', '1-18周星期二3-4节', 'B201', '李老师'],
+                ['计算机', '1-16周星期三5-6节', 'C301', '王老师'],
+                ['体育', '1-18周星期四7-8节', '体育馆', '赵老师']
+            ];
+
+            downloadExcel(data, '简化课表示例.xlsx');
+        }
+
+        // 生成英文课表示例
+        function generateEnglishSchedule() {
+            const data = [
+                ['Course', 'Class ID', 'Time', 'Location', 'Teacher'],
+                ['Advanced Mathematics', 'MATH101-01', '1-16周星期一3-4节', 'Building A Room 101', 'Prof. Zhang'],
+                ['College English', 'ENG101-02', '1-18周星期二1-2节', 'Language Building 201', 'Ms. Li'],
+                ['Programming Basics', 'CS101-01', '1-16周星期三6-7节', 'Computer Building 301', 'Dr. Wang'],
+                ['Physical Education', 'PE101-05', '1-18周星期四3-4节', 'Gymnasium', 'Coach Zhao']
+            ];
+
+            downloadExcel(data, 'English_Schedule_Sample.xlsx');
+        }
+
+        // 下载Excel文件
+        function downloadExcel(data, filename) {
+            // 创建工作簿
+            const wb = XLSX.utils.book_new();
+            
+            // 创建工作表
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            
+            // 设置列宽
+            const colWidths = [
+                {wch: 20}, // 课程名称
+                {wch: 15}, // 班号
+                {wch: 25}, // 时间
+                {wch: 20}, // 地点
+                {wch: 15}  // 教师
+            ];
+            ws['!cols'] = colWidths;
+
+            // 添加工作表到工作簿
+            XLSX.utils.book_append_sheet(wb, ws, '课表');
+            
+            // 导出文件
+            XLSX.writeFile(wb, filename);
+            
+            // 显示成功消息
+            showMessage('✅ 示例文件已生成并开始下载！');
+        }
+
+        // 显示消息
+        function showMessage(message) {
+            let messageEl = document.getElementById('message');
+            if (!messageEl) {
+                messageEl = document.createElement('div');
+                messageEl.id = 'message';
+                messageEl.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: #4CAF50;
+                    color: white;
+                    padding: 15px 20px;
+                    border-radius: 5px;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                    z-index: 1000;
+                    animation: slideIn 0.3s ease;
+                `;
+                document.body.appendChild(messageEl);
+            }
+            
+            messageEl.textContent = message;
+            messageEl.style.display = 'block';
+            
+            setTimeout(() => {
+                messageEl.style.display = 'none';
+            }, 3000);
+        }
+
+        // 添加CSS动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

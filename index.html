@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>课表查看器</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <h1>课表查看器</h1>
+            <div class="header-info">
+                <span id="current-week-info">当前周次：计算中...</span>
+                <button id="set-start-date" class="btn btn-secondary">设置学期开始日期</button>
+            </div>
+        </header>
+
+        <!-- 功能区 -->
+        <div class="controls">
+            <div class="week-selector">
+                <button id="prev-week" class="btn btn-nav">◄</button>
+                <select id="week-select" class="week-dropdown">
+                    <!-- 动态生成1-25周选项 -->
+                </select>
+                <button id="next-week" class="btn btn-nav">►</button>
+                <button id="current-week-btn" class="btn btn-primary">本周</button>
+            </div>
+            
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="搜索课程名称..." class="search-input">
+                <button id="search-btn" class="btn btn-primary">搜索</button>
+                <button id="clear-search" class="btn btn-secondary">清除</button>
+            </div>
+            
+            <div class="import-box">
+                <button id="import-btn" class="btn btn-primary">导入课表</button>
+                <input type="file" id="file-input" accept=".xlsx,.xls" style="display: none;">
+            </div>
+        </div>
+
+        <!-- 课表显示区 -->
+        <div id="schedule-container" class="schedule-container">
+            <div class="week-info">
+                <h2 id="week-title">第 1 周 课程安排</h2>
+                <div class="view-switcher">
+                    <button id="day-view-btn" class="view-btn active">日视图</button>
+                    <button id="week-view-btn" class="view-btn">周视图</button>
+                </div>
+            </div>
+            
+            <div id="weekday-tabs" class="weekday-tabs">
+                <button class="weekday-tab active" data-weekday="一">周一</button>
+                <button class="weekday-tab" data-weekday="二">周二</button>
+                <button class="weekday-tab" data-weekday="三">周三</button>
+                <button class="weekday-tab" data-weekday="四">周四</button>
+                <button class="weekday-tab" data-weekday="五">周五</button>
+                <button class="weekday-tab" data-weekday="六">周六</button>
+                <button class="weekday-tab" data-weekday="日">周日</button>
+            </div>
+            
+            <div id="courses-display" class="courses-display">
+                <!-- 课程卡片将动态生成 -->
+            </div>
+        </div>
+
+        <!-- 搜索结果区 -->
+        <div id="search-results" class="search-results" style="display: none;">
+            <h3>搜索结果</h3>
+            <button id="back-to-schedule" class="btn btn-secondary">返回课表</button>
+            <div id="search-results-content"></div>
+        </div>
+    </div>
+
+    <!-- 日期选择模态框 -->
+    <div id="date-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h3>设置学期开始日期</h3>
+            <input type="date" id="start-date-input" class="date-input">
+            <div class="modal-buttons">
+                <button id="save-date" class="btn btn-primary">保存</button>
+                <button id="cancel-date" class="btn btn-secondary">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 导入课表模态框 -->
+    <div id="import-modal" class="modal" style="display: none;">
+        <div class="modal-content import-modal-content">
+            <h3>导入课表文件</h3>
+            <div id="drop-zone" class="drop-zone">
+                <p>拖拽Excel文件到此处<br>或点击选择文件</p>
+                <input type="file" id="modal-file-input" accept=".xlsx,.xls" style="display: none;">
+            </div>
+            <div id="import-preview" class="import-preview" style="display: none;">
+                <h4>预览数据</h4>
+                <div id="preview-content"></div>
+            </div>
+            <div class="modal-buttons">
+                <button id="confirm-import" class="btn btn-primary" style="display: none;">确认导入</button>
+                <button id="cancel-import" class="btn btn-secondary">取消</button>
+            </div>
+            <div id="import-status" class="import-status"></div>
+        </div>
+    </div>
+
+    <!-- SheetJS库 -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <script src="courses_data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
