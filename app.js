@@ -586,46 +586,82 @@ function parseTimeString(timeStr) {
 
     if (!timeStr || typeof timeStr !== 'string') return results;
 
-    // 统一字符：全角转半角，去掉空格
-    timeStr = timeStr.replace(/[　]/g, ' ').replace(/\s+/g, '');
-    timeStr = timeStr.replace(/－/g, '-').replace(/，/g, ',');
+    // 统一字符：全角转半角，去掉多余空格
+    timeStr = timeStr.replace(/[　]/g, ' ').replace(/[，、]/g, ',').replace(/[；;]/g, ',');
+    timeStr = timeStr.replace(/－/g, '-').replace(/\s+/g, '');
 
-    // 常见模式：1-16周星期一3-4节 或 1-4,6-17周星期一6-7节
-    const mainPattern = /(\d+(?:-\d+)?(?:,\d+(?:-\d+)?)*)周(?:星期)?([一二三四五六日天])?(\d+(?:-\d+)?(?:,\d+(?:-\d+)?)*)?节?/g;
+    // 可能有多个时间段，用逗号/分号/斜杠分隔；先拆分
+    const segments = timeStr.split(/[,\/]+/).map(s => s.trim()).filter(Boolean);
 
-    let match;
-    while ((match = mainPattern.exec(timeStr)) !== null) {
-        const weeksStr = match[1] || '';
-        const weekday = match[2] || '';
-        const periodsStr = match[3] || '';
+    const weekdayChars = '[一二三四五六日天]';
+    const weekPart = '(\\d+(?:-\\d+)?(?:,\\d+(?:-\\d+)?)*)';
+    const periodsPart = '(\\d+(?:-\\d+)?(?:,\\d+(?:-\\d+)?)*)';
 
-        const weeks = parseWeeks(weeksStr);
-        const periods = periodsStr ? (periodsStr + '节') : '';
+    const patterns = [
+        // 带周和星期与节次：1-4,6周星期一3-4节 或 1-4周一3-4
+        new RegExp(`${weekPart}周(?:星期)?(${weekdayChars})${periodsPart}?节?`),
+        // 带星期和节次但无明确周次： 星期一3-4节
+        new RegExp(`(?:周)?(?:星期)?(${weekdayChars})${periodsPart}?节?`),
+        // 仅有周次： 10周 或 1-4周
+        new RegExp(`${weekPart}周`)
+    ];
 
-        if (weeks.length > 0) {
-            results.push({ weeks, weekday, periods });
+    for (const seg of segments) {
+        let matched = false;
+        for (const pat of patterns) {
+            const m = seg.match(pat);
+            if (m) {
+                // 尝试从 m 中抽取 weeks/weekday/periods（索引依模式而异）
+                let weeks = [];
+                let weekday = '';
+                let periods = '';
+
+                // 如果模式捕获到周次
+                const weekCapture = m[1] && m[1].includes('-') || m[1] && m[1].includes(',') ? m[1] : (m[1] && /^\d+$/.test(m[1]) ? m[1] : null);
+                // 如果第一个捕获为数字串且后续是星期，则 weekCapture may be defined; else check for other groups
+                if (weekCapture) {
+                    weeks = parseWeeks(weekCapture);
+                } else if (m[0] && /\d+周/.test(m[0])) {
+                    // fallback extract week numbers from full match
+                    const w = m[0].match(/(\\d+(?:-\\d+)?(?:,\\d+(?:-\\d+)?)*)周/);
+                    if (w) weeks = parseWeeks(w[1]);
+                }
+
+                // weekday detection: search for Chinese weekday char
+                const wd = seg.match(new RegExp(`(${weekdayChars})`));
+                if (wd) weekday = wd[1];
+
+                // periods detection: numbers before '节' or trailing numbers
+                const p = seg.match(new RegExp(`${periodsPart}(?=节)|(?<=星期${weekdayChars})${periodsPart}(?=节)|${periodsPart}$`));
+                if (p) periods = (p[0] || '').trim() + (p[0] ? '节' : '');
+
+                // 如果没有明确周次但字符串像纯数字（例如 '10'），也当作周次
+                if (weeks.length === 0) {
+                    const onlyNum = seg.match(/^(\\d{1,2})$/);
+                    if (onlyNum) weeks = parseWeeks(onlyNum[1]);
+                }
+
+                // finally push if we have any useful info
+                if (weeks.length > 0 || weekday || periods) {
+                    results.push({ weeks, weekday, periods });
+                    matched = true;
+                    break;
+                }
+            }
         }
-    }
 
-    // 如果没有任何结果，尝试只匹配单纯的周次如 "10周" 或 "8周星期六6-9节"（无'星期'关键字）
-    if (results.length === 0) {
-        // 尝试匹配如 "10周" 或 "1-4,6-17周"
-        const onlyWeek = timeStr.match(/(\d+(?:-\d+)?(?:,\d+(?:-\d+)?)*)周/);
-        if (onlyWeek) {
-            const weeks = parseWeeks(onlyWeek[1]);
-            if (weeks.length > 0) results.push({ weeks, weekday: '', periods: '' });
-        }
+        // 如果没有任何模式匹配，尝试直接从段中抽取周次或星期
+        if (!matched) {
+            // 直接寻找周次
+            const wk = seg.match(/(\d+(?:-\d+)?(?:,\d+(?:-\d+)?)*)/);
+            const wd = seg.match(new RegExp(`(${weekdayChars})`));
+            const p = seg.match(/(\d+(?:-\d+)?(?:,\d+(?:-\d+)?)*)节?/);
 
-        // 尝试匹配包含星期但没有周字的情况，例如 "8周星期六6-9节" 或 "8星期六6-9节"
-        const altPattern = /(\d+(?:-\d+)?(?:,\d+(?:-\d+)?)*)?(?:周)?(?:星期)?([一二三四五六日天])(\d+(?:-\d+)?(?:,\d+(?:-\d+)?)*)?节?/;
-        const altMatch = timeStr.match(altPattern);
-        if (altMatch) {
-            const weeksStr = altMatch[1] || '';
-            const weekday = altMatch[2] || '';
-            const periodsStr = altMatch[3] || '';
-            const weeks = weeksStr ? parseWeeks(weeksStr) : [];
-            const periods = periodsStr ? (periodsStr + '节') : '';
-            if (weeks.length > 0 || weekday) {
+            const weeks = wk ? parseWeeks(wk[1]) : [];
+            const weekday = wd ? wd[1] : '';
+            const periods = (p && p[1]) ? (p[1] + '节') : '';
+
+            if (weeks.length > 0 || weekday || periods) {
                 results.push({ weeks, weekday, periods });
             }
         }
@@ -637,32 +673,37 @@ function parseTimeString(timeStr) {
 // 解析周次字符串
 function parseWeeks(weeksStr) {
     const weeks = [];
-    
+    if (!weeksStr || typeof weeksStr !== 'string') return weeks;
+
+    // 清理可能的浮点尾数，如 10.0 -> 10
+    weeksStr = weeksStr.replace(/\.0+/g, '');
+
     // 分割逗号分隔的部分
-    const parts = weeksStr.split(',');
-    
+    const parts = weeksStr.split(',').map(p => p.trim()).filter(Boolean);
+
     for (const part of parts) {
-        const trimmed = part.trim();
-        
+        const trimmed = part.replace(/；/g, ';').trim();
+        if (!trimmed) continue;
+
         if (trimmed.includes('-')) {
-            // 范围形式，如 "1-16"
-            const [start, end] = trimmed.split('-').map(s => parseInt(s.trim()));
+            const [startRaw, endRaw] = trimmed.split('-').map(s => s.trim());
+            const start = parseInt(startRaw);
+            const end = parseInt(endRaw);
             if (!isNaN(start) && !isNaN(end)) {
-                for (let i = start; i <= end; i++) {
-                    if (i >= 1 && i <= 25) {
-                        weeks.push(i);
-                    }
+                const s = Math.max(1, Math.min(25, start));
+                const e = Math.max(1, Math.min(25, end));
+                for (let i = Math.min(s, e); i <= Math.max(s, e); i++) {
+                    weeks.push(i);
                 }
             }
         } else {
-            // 单个周次
             const week = parseInt(trimmed);
             if (!isNaN(week) && week >= 1 && week <= 25) {
                 weeks.push(week);
             }
         }
     }
-    
+
     // 去重并排序
     return [...new Set(weeks)].sort((a, b) => a - b);
 }
@@ -1035,6 +1076,29 @@ function displayWeekView(week) {
     });
     
     html += '</div>';
+    // 处理没有明确 weekday 的课程，放在“未定/其他”列
+    const unspecified = coursesData.filter(c => c.weeks && c.weeks.includes(week) && (!c.weekday || c.weekday === ''));
+
+    if (unspecified.length > 0) {
+        let otherHtml = `
+            <div class="weekday-column">
+                <div class="weekday-header">未定/其他</div>
+                ${unspecified.map(course => `
+                    <div class="course-card">
+                        <div class="course-time">${course.periods || course.time || '时间未定'}</div>
+                        <div class="course-name">${course.name}</div>
+                        <div class="course-details">
+                            <div class="course-location">📍 ${course.location || '地点待定'}</div>
+                            <div class="course-teacher">👤 ${course.teacher}</div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+
+        html = html.replace('</div>', otherHtml + '</div>');
+    }
+
     elements.coursesDisplay.innerHTML = html;
 }
 
