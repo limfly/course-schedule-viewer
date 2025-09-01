@@ -10,6 +10,7 @@
     <div id="app">
         <div class="header">
             <h1>课表查看器</h1>
+            <button id="settings-btn">⚙️</button>
             <div class="controls">
                 <button id="prevWeek">上一周</button>
                 <span id="currentWeek"></span>
@@ -36,6 +37,20 @@
             </table>
         </div>
     </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>设置</h2>
+                <span class="close-btn">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>这里将来会是设置选项。</p>
+            </div>
+        </div>
+    </div>
+
     <script src="courses_data.js"></script>
     <script src="app.js"></script>
 </body>

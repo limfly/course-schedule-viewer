@@ -1,6 +1,7 @@
 // 全局变量
 let currentWeek = 1;
 const totalWeeks = 20;
+let config = {};
 const timeSlots = [
     "第一节 8:00-8:45",
     "第二节 8:55-9:40",
@@ -19,8 +20,25 @@ const scheduleBody = document.getElementById('scheduleBody');
 const currentWeekSpan = document.getElementById('currentWeek');
 const prevWeekBtn = document.getElementById('prevWeek');
 const nextWeekBtn = document.getElementById('nextWeek');
+const settingsBtn = document.getElementById('settings-btn');
+const settingsModal = document.getElementById('settings-modal');
+const closeBtn = document.querySelector('.close-btn');
 
 // 事件监听器
+settingsBtn.addEventListener('click', () => {
+    settingsModal.classList.remove('hidden');
+});
+
+closeBtn.addEventListener('click', () => {
+    settingsModal.classList.add('hidden');
+});
+
+window.addEventListener('click', (event) => {
+    if (event.target == settingsModal) {
+        settingsModal.classList.add('hidden');
+    }
+});
+
 prevWeekBtn.addEventListener('click', () => {
     if (currentWeek > 1) {
         currentWeek--;
@@ -102,9 +120,28 @@ function updateSchedule() {
     });
 }
 
+// 配置管理
+function loadConfig() {
+    const savedConfig = localStorage.getItem('courseViewerConfig');
+    if (savedConfig) {
+        config = JSON.parse(savedConfig);
+    } else {
+        // 默认配置
+        config = {
+            startWeek: 1,
+            totalWeeks: 20,
+        };
+    }
+}
+
+function saveConfig() {
+    localStorage.setItem('courseViewerConfig', JSON.stringify(config));
+}
+
 // 初始化课表
 document.addEventListener('DOMContentLoaded', () => {
+    loadConfig();
     // 设置初始周数（可以根据实际日期计算）
-    currentWeek = 1;
+    currentWeek = config.startWeek || 1;
     updateSchedule();
 });
