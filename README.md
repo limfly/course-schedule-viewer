@@ -24,7 +24,7 @@
 
 ## 🖥️ 在线访问
 
-访问地址：[https://你的用户名.github.io/course-schedule-viewer/](https://你的用户名.github.io/course-schedule-viewer/)
+访问地址：[https://limfly.github.io/course-schedule-viewer/](https://你的用户名.github.io/course-schedule-viewer/)
 
 ## 📖 使用指南
 
