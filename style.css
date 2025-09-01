@@ -399,6 +399,65 @@ body {
     margin: 0;
 }
 
+/* Mobile-specific tweaks to avoid text overlap and make week view usable */
+@media (max-width: 600px) {
+    .container {
+        padding: 10px;
+        max-width: 100%;
+    }
+
+    .header {
+        padding: 12px;
+        border-radius: 0;
+    }
+
+    .header h1 {
+        font-size: 1.4em;
+    }
+
+    .header-info { display: none; }
+
+    .week-info h2 { font-size: 1em; }
+
+    /* make course cards wrap text and reduce size so they don't overflow */
+    .course-card {
+        padding: 8px;
+        font-size: 13px;
+        line-height: 1.25;
+        border-radius: 6px;
+        min-height: 40px;
+        max-width: 220px;
+        word-break: break-word;
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+
+    .course-name { font-size: 14px; }
+    .course-details { font-size: 12px; line-height: 1.2; }
+
+    /* layout: allow horizontal scrolling across days to avoid vertical overlap */
+    .courses-display {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 12px;
+    }
+
+    /* ensure each card appears above background and doesn't get clipped */
+    .course-card { position: relative; z-index: 2; }
+
+    /* reduce padding for controls */
+    .controls { gap: 8px; }
+    .search-input { width: 140px; }
+    #proxy-url-input { width: 180px; }
+}
+
+/* Small improvements for medium screens */
+@media (min-width: 601px) and (max-width: 900px) {
+    .container { max-width: 900px; padding: 12px; }
+    .course-card { font-size: 14px; padding: 10px; }
+}
+
 .import-preview {
     max-height: 300px;
     overflow-y: auto;
