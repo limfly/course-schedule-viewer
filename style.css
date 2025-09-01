@@ -630,6 +630,68 @@ body {
     }
 }
 
+/* Mobile-first week-card layout: horizontal, snap-scrolling cards for each weekday */
+@media (max-width: 600px) {
+    .week-view-container {
+        display: flex;
+        flex-direction: row;
+        gap: 12px;
+        margin-top: 12px;
+        overflow-x: auto;
+        padding-bottom: 10px;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .weekday-column {
+        flex: 0 0 84%; /* each day becomes a card taking most of the viewport */
+        min-width: 260px;
+        max-width: 360px;
+        scroll-snap-align: start;
+        margin: 0;
+        padding: 12px;
+        min-height: 200px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+        border-radius: 10px;
+        background: linear-gradient(180deg, #ffffff, #fbfdff);
+    }
+
+    .weekday-header {
+        text-align: left;
+        padding-left: 8px;
+        margin-bottom: 10px;
+        font-size: 1.05em;
+    }
+
+    .week-view-container .course-card {
+        margin-bottom: 8px;
+        padding: 10px;
+        font-size: 0.9em;
+        border-radius: 8px;
+        border-left-width: 4px;
+    }
+
+    .week-view-container .course-time {
+        font-size: 0.95em;
+    }
+
+    .week-view-container .course-name {
+        font-size: 1em;
+        margin-bottom: 6px;
+    }
+
+    /* make weekday tabs compact and allow horizontal scroll if present */
+    .weekday-tabs {
+        overflow-x: auto;
+        padding-bottom: 6px;
+    }
+
+    /* reduce padding in overall container on small screens */
+    .schedule-container {
+        padding: 18px;
+    }
+}
+
 /* 加载状态 */
 .loading {
     text-align: center;

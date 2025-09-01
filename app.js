@@ -40,10 +40,28 @@ document.addEventListener('DOMContentLoaded', function() {
     loadSemesterStartDate();
     loadScheduleData();
     updateCurrentWeekInfo();
+    // 在加载时根据屏幕宽度决定默认视图：小屏幕使用周视图卡片，大屏使用日视图
+    try {
+        loadProxyUrlFromStorage();
+        const isSmall = window.matchMedia && window.matchMedia('(max-width:600px)').matches;
+        if (isSmall) {
+            currentView = 'week';
+            document.getElementById('week-view-btn').classList.add('active');
+            document.getElementById('day-view-btn').classList.remove('active');
+            document.getElementById('weekday-tabs').style.display = 'none';
+        } else {
+            currentView = 'day';
+            document.getElementById('day-view-btn').classList.add('active');
+            document.getElementById('week-view-btn').classList.remove('active');
+            document.getElementById('weekday-tabs').style.display = 'flex';
+        }
+    } catch (e) {
+        console.warn('初始化视图时出错，使用默认设置', e);
+    }
+
     displayWeekSchedule(currentWeek);
     setupEventListeners();
     setupImportHandlers();
-    loadProxyUrlFromStorage();
 });
 
 // 加载课表数据
