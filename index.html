@@ -17,8 +17,12 @@
             </div>
         </header>
 
-        <!-- 功能区 -->
-        <div class="controls">
+        <!-- 设置面板（默认折叠到侧边） -->
+        <button id="settings-btn" class="btn btn-secondary header-settings">设置</button>
+        <aside id="settings-panel" class="settings-panel" aria-hidden="true">
+            <div class="settings-inner">
+            <h3>设置与导入</h3>
+            <div class="controls">
             <div class="week-selector">
                 <button id="prev-week" class="btn btn-nav">◄</button>
                 <select id="week-select" class="week-dropdown">
@@ -36,7 +40,7 @@
             
             <div class="import-box">
                 <button id="import-btn" class="btn btn-primary">导入课表</button>
-                <input type="file" id="file-input" accept=".xlsx,.xls" style="display: none;">
+                <input type="file" id="file-input" accept=".xlsx,.xls,.csv,.json,.txt,image/*" style="display: none;">
             </div>
             <div class="view-mode-box" style="display:inline-flex; align-items:center; gap:8px;">
                 <label for="compact-toggle" style="font-size:14px; color:#495057;">移动端视图：</label>
@@ -49,7 +53,9 @@
                 <input id="proxy-url-input" type="text" placeholder="代理 URL (例如 https://your-app.vercel.app)" style="width:320px;" />
                 <button id="save-proxy-btn" class="btn btn-secondary">保存代理</button>
             </div>
-        </div>
+            </div>
+            <button id="close-settings" class="btn btn-secondary">关闭</button>
+        </aside>
 
         <!-- 课表显示区 -->
         <div id="schedule-container" class="schedule-container">

@@ -68,7 +68,24 @@ document.addEventListener('DOMContentLoaded', function() {
     setupEventListeners();
     setupImportHandlers();
     setupMobileViewToggle();
+    setupSettingsPanel();
 });
+
+// 设置面板逻辑
+function setupSettingsPanel(){
+    const btn = document.getElementById('settings-btn');
+    const panel = document.getElementById('settings-panel');
+    const close = document.getElementById('close-settings');
+    if(!btn || !panel) return;
+    btn.addEventListener('click', ()=>{
+        panel.style.display = 'block';
+        panel.setAttribute('aria-hidden','false');
+    });
+    if(close) close.addEventListener('click', ()=>{
+        panel.style.display = 'none';
+        panel.setAttribute('aria-hidden','true');
+    });
+}
 
 // 绑定移动端视图开关
 function setupMobileViewToggle(){
@@ -162,6 +179,12 @@ function setupImportHandlers() {
             handleFile(e.target.files[0]);
         }
     });
+
+    // 支持页面顶部快速文件输入
+    const topFileInput = document.getElementById('file-input');
+    if(topFileInput){
+        topFileInput.addEventListener('change', (e)=>{ if(e.target.files && e.target.files[0]) handleFile(e.target.files[0]); });
+    }
     
     // 拖拽事件
     elements.dropZone.addEventListener('dragover', (e) => {
@@ -213,13 +236,110 @@ function resetImportModal() {
 
 // 处理文件
 async function handleFile(file) {
-    if (!file.name.match(/\.(xlsx|xls)$/i)) {
-        showImportStatus('请选择Excel文件 (.xlsx 或 .xls)', 'error');
+    // 支持的文件类型：Excel, CSV, JSON, TXT(表格行), 图片（由代理处理）
+    const name = file.name || '';
+    const lower = name.toLowerCase();
+    showImportStatus('正在读取文件...', 'info');
+
+    try {
+        // 图片文件走代理识别（前端不做 OCR）
+        if(file.type.startsWith('image/') || lower.match(/\.(png|jpe?g|bmp|gif|tiff)$/)){
+            if(!AI_PROXY_URL) throw new Error('图片识别需要配置后端 AI 代理（代理 URL 未设置）');
+            showImportStatus('检测到图片文件，已将文件发送到代理进行识别，请稍候...', 'info');
+            const form = new FormData();
+            form.append('file', file);
+            form.append('fileName', file.name);
+            const resp = await fetch(AI_PROXY_URL + '/parse-image', { method: 'POST', body: form });
+            if(!resp.ok) throw new Error('代理返回错误：' + resp.status);
+            const proxyResult = await resp.json();
+            if(proxyResult && proxyResult.success){
+                pendingImportData = proxyResult;
+                showPreview(proxyResult);
+                elements.confirmImport.style.display = 'block';
+                showImportStatus('图片解析完成，预览已生成', 'success');
+                return;
+            } else {
+                showImportStatus('图片解析失败，代理未返回有效结果', 'error');
+                return;
+            }
+        }
+
+        // 文本或表格类型：分别读取
+        if(lower.match(/\.(xlsx|xls)$/i)){
+            const data = await readExcelFile(file);
+            return await processParsedData(data, file.name);
+        } else if(lower.match(/\.(csv)$/i) || file.type === 'text/csv'){
+            const text = await file.text();
+            const data = csvToRows(text);
+            return await processParsedData({ sheets: ['csv'], data: data }, file.name);
+        } else if(lower.match(/\.(json)$/i) || file.type === 'application/json'){
+            const text = await file.text();
+            let parsed = JSON.parse(text);
+            // accept array of records or object with rows
+            if(Array.isArray(parsed)){
+                // convert array of objects to rows with header
+                const headers = Object.keys(parsed[0] || {});
+                const rows = [headers];
+                parsed.forEach(obj => rows.push(headers.map(h=> obj[h] ?? '')));
+                return await processParsedData({ sheets: ['json'], data: rows }, file.name);
+            } else if(parsed.rows){
+                return await processParsedData({ sheets: ['json'], data: parsed.rows }, file.name);
+            } else {
+                throw new Error('无法识别的 JSON 结构');
+            }
+        } else if(lower.match(/\.(txt)$/i) || file.type.startsWith('text/')){
+            const text = await file.text();
+            // 尝试按行分割，使用制表符或逗号分列
+            const rows = text.split(/\r?\n/).map(line => line.split(/\t|,+/).map(c => c.trim()));
+            return await processParsedData({ sheets: ['txt'], data: rows }, file.name);
+        } else {
+            showImportStatus('不支持的文件类型，请选择 Excel/CSV/JSON/TXT 或 图片', 'error');
+            return;
+        }
+    } catch (error) {
+        console.error('处理文件失败', error);
+        showImportStatus('文件处理失败：' + error.message, 'error');
         return;
     }
     
-    showImportStatus('正在读取文件...', 'info');
-    
+
+async function processParsedData(data, fileName){
+    let parseResult = parseScheduleData(data, fileName);
+    if((!parseResult.success || (parseResult.confidence || 0) < 50) && AI_PROXY_URL){
+        try{
+            showImportStatus('本地解析置信度较低，尝试使用后端 AI 代理解析...', 'info');
+            const rows = data.data.slice(0,500).map(r=> r.map(c=> (c===undefined||c===null)?'':String(c)));
+            const resp = await fetch(AI_PROXY_URL + '/parse-excel', { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ fileName, rows }) });
+            if(resp.ok){
+                const proxyResult = await resp.json();
+                if(proxyResult && proxyResult.success){
+                    parseResult = proxyResult;
+                }
+            }
+        }catch(e){ console.warn('代理解析失败', e); }
+    }
+
+    if(parseResult.success){
+        pendingImportData = parseResult;
+        showPreview(parseResult);
+        showImportStatus(`成功解析 ${parseResult.courses.length} 条课程记录`, 'success');
+        elements.confirmImport.style.display = 'block';
+    } else {
+        showImportStatus(parseResult.message || '文件格式不正确', 'error');
+        showDetailedErrors(parseResult.errors || []);
+    }
+}
+
+// 将 CSV 文本转换为二维数组（粗略实现）
+function csvToRows(text){
+    const lines = text.split(/\r?\n/).filter(Boolean);
+    const rows = lines.map(line => {
+        // 支持带引号的 CSV（简单）
+        const cols = line.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(c=> c.replace(/^\s*"|"\s*$/g,'').trim());
+        return cols;
+    });
+    return rows;
+}
     try {
         const data = await readExcelFile(file);
         let parseResult = parseScheduleData(data, file.name);
@@ -1061,7 +1181,7 @@ function displayWeekView(week) {
         '日': '星期日'
     };
     
-    // 如果小屏并且用户期望紧凑视图，则使用 compact-week
+    // 计算是否是小屏（手机），在手机上尽量使用紧凑一屏网格
     const isSmall = window.matchMedia && window.matchMedia('(max-width:600px)').matches;
     const weekContainerClass = isSmall ? 'week-view-container compact-week' : 'week-view-container';
 
