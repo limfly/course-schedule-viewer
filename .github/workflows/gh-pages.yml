@@ -22,6 +22,29 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Python requirements (if present)
+        run: |
+          if [ -f requirements.txt ]; then
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+          else
+            echo "no requirements.txt, skipping"
+          fi
+
+      - name: Auto-generate courses_data.js from Excel if present
+        run: |
+          if [ -f "课表.xlsx" ]; then
+            echo "Found 课表.xlsx, running export_excel_to_json.py"
+            python export_excel_to_json.py "课表.xlsx"
+          else
+            echo "No 课表.xlsx found in repo root, skipping export step"
+          fi
+
       - name: Debug: list repository root
         run: |
           echo "Repository root files:" 
