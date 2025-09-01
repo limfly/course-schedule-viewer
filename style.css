@@ -1,21 +1,23 @@
-/* 全局变量 */
 :root {
+    /* 基础颜色 */
     --primary-color: #1fb6ff;
     --text-color: #333;
     --bg-color: #f5f7fa;
     --border-color: #e4e8f0;
+    
+    /* 课程卡片颜色（使用柔和的色调） */
+    --course-color-1: #E6F3FF;  /* 淡蓝色 */
+    --course-color-2: #FFF0E6;  /* 淡橙色 */
+    --course-color-3: #E6FFE6;  /* 淡绿色 */
+    --course-color-4: #FFE6E6;  /* 淡红色 */
+    --course-color-5: #F2E6FF;  /* 淡紫色 */
+    --course-color-6: #E6FFF9;  /* 淡青色 */
+    --course-color-7: #FFF9E6;  /* 淡黄色 */
+    --course-color-8: #FFE6F6;  /* 淡粉色 */
+    
+    /* 尺寸 */
     --header-height: 48px;
-    --radius-sm: 8px;
-    --radius-md: 12px;
-    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
-
-    /* 课程卡片颜色 */
-    --course-color-1: #4fd1c5;  /* 青色 - 高数 */
-    --course-color-2: #f6ad55;  /* 橙色 - 物理 */
-    --course-color-3: #fc8181;  /* 红色 - 实验 */
-    --course-color-4: #b794f4;  /* 紫色 - 英语 */
-    --course-color-5: #9ae6b4;  /* 绿色 - 体育 */
+    --cell-height: 60px;
 }
 
 /* 基础样式重置 */

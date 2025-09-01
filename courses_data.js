@@ -1,177 +1,608 @@
-// 默认课表数据 - 示例数据
-window.coursesData = [
+const coursesData = [
   {
-    "name": "高等数学A",
-    "classId": "MATH001-01",
-    "time": "1-16周星期一1-2节",
-    "location": "教学楼A101",
-    "teacher": "张老师",
+    "name": "形势与政策3",
     "weeks": [
-      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+      12,
+      13,
+      14,
+      15
     ],
-    "weekday": "一",
-    "periods": "1-2节"
+    "day": 5,
+    "start": 8,
+    "end": 9,
+    "location": "D1147",
+    "teacher": "陈瀚谕",
+    "class_id": "000553-071",
+    "color": 0
   },
   {
-    "name": "大学英语",
-    "classId": "ENG001-02",
-    "time": "1-16周星期二3-4节",
-    "location": "外语楼B205",
-    "teacher": "李老师",
+    "name": "毛泽东思想和中国特色社会主义理论体系概论",
     "weeks": [
-      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+      1,
+      2,
+      3,
+      4,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17
     ],
-    "weekday": "二",
-    "periods": "3-4节"
+    "day": 1,
+    "start": 6,
+    "end": 7,
+    "location": "D1243",
+    "teacher": "黄炎",
+    "class_id": "992336-029",
+    "color": 1
   },
   {
-    "name": "大学物理",
-    "classId": "PHY001-01",
-    "time": "1-12周星期三5-6节",
-    "location": "理科楼C301",
-    "teacher": "王老师",
+    "name": "地质学基础（双语）",
     "weeks": [
-      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+      8
     ],
-    "weekday": "三",
-    "periods": "5-6节"
+    "day": 6,
+    "start": 6,
+    "end": 9,
+    "location": "科学中心207-207",
+    "teacher": "廖志伟",
+    "class_id": "992284-002-001E",
+    "color": 3
   },
   {
-    "name": "计算机基础",
-    "classId": "CS001-03",
-    "time": "2-14周星期四7-8节",
-    "location": "计算机楼D401",
-    "teacher": "刘老师",
+    "name": "地质学基础（双语）",
     "weeks": [
-      2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+      9
     ],
-    "weekday": "四",
-    "periods": "7-8节"
+    "day": 6,
+    "start": 6,
+    "end": 9,
+    "location": "科学中心207-207",
+    "teacher": "廖志伟",
+    "class_id": "992284-002-001E",
+    "color": 3
   },
   {
-    "name": "体育",
-    "classId": "PE001-05",
-    "time": "1-16周星期五9-10节",
-    "location": "体育馆",
-    "teacher": "陈老师",
+    "name": "工程力学II",
     "weeks": [
-      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+      8
     ],
-    "weekday": "五",
-    "periods": "9-10节"
+    "day": 1,
+    "start": 3,
+    "end": 4,
+    "location": "虚拟仿真教学实验室I（DS2A216）-DS2A216",
+    "teacher": "尹瑞森",
+    "class_id": "992542-001-001E",
+    "color": 4
   },
   {
-    "name": "线性代数",
-    "classId": "MATH002-01",
-    "time": "3-15周星期一3-4节",
-    "location": "教学楼A203",
-    "teacher": "赵老师",
+    "name": "工程力学II",
     "weeks": [
-      3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+      11
     ],
-    "weekday": "一",
-    "periods": "3-4节"
+    "day": 2,
+    "start": 3,
+    "end": 4,
+    "location": "力学中心(DS2A133)-DS2A133",
+    "teacher": "刘浩",
+    "class_id": "992542-001-001E",
+    "color": 4
   },
   {
-    "name": "思想道德与法治",
-    "classId": "IDEO001-02",
-    "time": "1-12周星期二1-2节",
-    "location": "人文楼E102",
-    "teacher": "孙老师",
+    "name": "工程力学II",
     "weeks": [
-      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+      9
     ],
-    "weekday": "二",
-    "periods": "1-2节"
+    "day": 2,
+    "start": 3,
+    "end": 4,
+    "location": "力学中心(DS2A133)-DS2A133",
+    "teacher": "尹瑞森",
+    "class_id": "992542-001-001E",
+    "color": 4
   },
   {
-    "name": "程序设计基础",
-    "classId": "CS002-01",
-    "time": "1-16周星期三1-2节",
-    "location": "计算机楼D501",
-    "teacher": "周老师",
+    "name": "工程力学II",
     "weeks": [
-      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+      12
     ],
-    "weekday": "三",
-    "periods": "1-2节"
+    "day": 3,
+    "start": 6,
+    "end": 7,
+    "location": "力学中心（DS2A213）-DS2A213",
+    "teacher": "江智平",
+    "class_id": "992542-001-001E",
+    "color": 4
   },
   {
-    "name": "大学化学",
-    "classId": "CHEM001-01",
-    "time": "1-10周星期四3-4节",
-    "location": "化学楼F201",
-    "teacher": "吴老师",
+    "name": "电工电子学（Ⅲ）",
     "weeks": [
-      1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+      2,
+      3,
+      4,
+      6,
+      7,
+      8,
+      9,
+      10
     ],
-    "weekday": "四",
-    "periods": "3-4节"
+    "day": 2,
+    "start": 1,
+    "end": 2,
+    "location": "D1433",
+    "teacher": "马金玲",
+    "class_id": "154005-001",
+    "color": 6
   },
   {
-    "name": "工程制图",
-    "classId": "ENG002-02",
-    "time": "1-16周星期五5-6节",
-    "location": "工程楼G301",
-    "teacher": "郑老师",
+    "name": "电工电子学（Ⅲ）",
     "weeks": [
-      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+      2,
+      3,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
     ],
-    "weekday": "五",
-    "periods": "5-6节"
+    "day": 4,
+    "start": 1,
+    "end": 2,
+    "location": "D1433",
+    "teacher": "马金玲",
+    "class_id": "154005-001",
+    "color": 6
   },
   {
-    "name": "物理实验",
-    "classId": "PHY001-E01",
-    "time": "5周星期一8-10节",
-    "location": "物理实验室",
-    "teacher": "何老师",
-    "weeks": [5],
-    "weekday": "一",
-    "periods": "8-10节"
-  },
-  {
-    "name": "物理实验",
-    "classId": "PHY001-E01",
-    "time": "8周星期一8-10节",
-    "location": "物理实验室",
-    "teacher": "何老师",
-    "weeks": [8],
-    "weekday": "一",
-    "periods": "8-10节"
-  },
-  {
-    "name": "计算机实验",
-    "classId": "CS001-E01",
-    "time": "6周星期二10-12节",
-    "location": "计算机实验室",
-    "teacher": "许老师",
-    "weeks": [6],
-    "weekday": "二",
-    "periods": "10-12节"
-  },
-  {
-    "name": "军事理论",
-    "classId": "MIL001-01",
-    "time": "1-8周星期六3-4节",
-    "location": "大礼堂",
-    "teacher": "马老师",
+    "name": "工程力学II",
     "weeks": [
-      1, 2, 3, 4, 5, 6, 7, 8
+      1,
+      2,
+      3,
+      4,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16
     ],
-    "weekday": "六",
-    "periods": "3-4节"
+    "day": 1,
+    "start": 1,
+    "end": 2,
+    "location": "D1126",
+    "teacher": "刘瑶璐",
+    "class_id": "992542-001",
+    "color": 4
   },
   {
-    "name": "职业规划",
-    "classId": "CAR001-01",
-    "time": "9-12周星期三7-8节",
-    "location": "教学楼A305",
-    "teacher": "黄老师",
+    "name": "工程力学II",
     "weeks": [
-      9, 10, 11, 12
+      1,
+      2,
+      3,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16
     ],
-    "weekday": "三",
-    "periods": "7-8节"
+    "day": 5,
+    "start": 1,
+    "end": 2,
+    "location": "D1335",
+    "teacher": "刘瑶璐",
+    "class_id": "992542-001",
+    "color": 4
+  },
+  {
+    "name": "复变函数",
+    "weeks": [
+      1,
+      2,
+      3,
+      4,
+      6,
+      7,
+      8,
+      9
+    ],
+    "day": 1,
+    "start": 10,
+    "end": 11,
+    "location": "D1125",
+    "teacher": "李江涛",
+    "class_id": "108215-002",
+    "color": 7
+  },
+  {
+    "name": "复变函数",
+    "weeks": [
+      1,
+      2,
+      3,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "day": 3,
+    "start": 10,
+    "end": 11,
+    "location": "D1125",
+    "teacher": "李江涛",
+    "class_id": "108215-002",
+    "color": 7
+  },
+  {
+    "name": "文明经典A",
+    "weeks": [
+      1,
+      2,
+      3,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18
+    ],
+    "day": 3,
+    "start": 8,
+    "end": 9,
+    "location": "D1533",
+    "teacher": "慕容浩",
+    "class_id": "994456-022",
+    "color": 1
+  },
+  {
+    "name": "智能优化与决策",
+    "weeks": [
+      1,
+      2,
+      3,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "day": 2,
+    "start": 8,
+    "end": 9,
+    "location": "DYC106",
+    "teacher": "蒲源源",
+    "class_id": "992621-001",
+    "color": 2
+  },
+  {
+    "name": "智能优化与决策",
+    "weeks": [
+      1,
+      2,
+      3,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "day": 5,
+    "start": 6,
+    "end": 7,
+    "location": "DYC106",
+    "teacher": "蒲源源",
+    "class_id": "992621-001",
+    "color": 2
+  },
+  {
+    "name": "习近平新时代中国特色社会主义思想概论",
+    "weeks": [
+      1,
+      2,
+      3,
+      4,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17
+    ],
+    "day": 1,
+    "start": 8,
+    "end": 9,
+    "location": "D1244",
+    "teacher": "陈培礼",
+    "class_id": "992333-016",
+    "color": 4
+  },
+  {
+    "name": "习近平新时代中国特色社会主义思想概论",
+    "weeks": [
+      1,
+      2,
+      3,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "day": 5,
+    "start": 8,
+    "end": 9,
+    "location": "D1244",
+    "teacher": "陈培礼",
+    "class_id": "992333-016",
+    "color": 4
+  },
+  {
+    "name": "地质学基础（双语）",
+    "weeks": [
+      7,
+      8,
+      9
+    ],
+    "day": 2,
+    "start": 10,
+    "end": 12,
+    "location": "D1318",
+    "teacher": "殷黎明",
+    "class_id": "992284-002",
+    "color": 3
+  },
+  {
+    "name": "地质学基础（双语）",
+    "weeks": [
+      1,
+      2,
+      3,
+      6
+    ],
+    "day": 2,
+    "start": 10,
+    "end": 12,
+    "location": "D1416",
+    "teacher": "罗永江",
+    "class_id": "992284-002",
+    "color": 3
+  },
+  {
+    "name": "地质学基础（双语）",
+    "weeks": [
+      6,
+      7
+    ],
+    "day": 5,
+    "start": 10,
+    "end": 12,
+    "location": "D1201",
+    "teacher": "殷黎明",
+    "class_id": "992284-002",
+    "color": 3
+  },
+  {
+    "name": "地质学基础（双语）",
+    "weeks": [
+      8,
+      9
+    ],
+    "day": 5,
+    "start": 10,
+    "end": 11,
+    "location": "D1201",
+    "teacher": "殷黎明",
+    "class_id": "992284-002",
+    "color": 3
+  },
+  {
+    "name": "地质学基础（双语）",
+    "weeks": [
+      1,
+      2,
+      3
+    ],
+    "day": 5,
+    "start": 10,
+    "end": 12,
+    "location": "D1210",
+    "teacher": "罗永江",
+    "class_id": "992284-002",
+    "color": 3
+  },
+  {
+    "name": "电工电子学（Ⅲ）",
+    "weeks": [
+      9
+    ],
+    "day": 1,
+    "start": 3,
+    "end": 4,
+    "location": "电子技术基础实验室3-DS1325",
+    "teacher": "林婷",
+    "class_id": "154005-006-001E-01",
+    "color": 6
+  },
+  {
+    "name": "电工电子学（Ⅲ）",
+    "weeks": [
+      10
+    ],
+    "day": 1,
+    "start": 3,
+    "end": 4,
+    "location": "电子技术基础实验室3-DS1325",
+    "teacher": "林婷",
+    "class_id": "154005-006-001E-01",
+    "color": 6
+  },
+  {
+    "name": "电工电子学（Ⅲ）",
+    "weeks": [
+      11
+    ],
+    "day": 1,
+    "start": 3,
+    "end": 4,
+    "location": "电子技术基础实验室3-DS1325",
+    "teacher": "林婷",
+    "class_id": "154005-006-001E-01",
+    "color": 6
+  },
+  {
+    "name": "电工电子学（Ⅲ）",
+    "weeks": [
+      12
+    ],
+    "day": 1,
+    "start": 3,
+    "end": 4,
+    "location": "电子技术基础实验室3-DS1325",
+    "teacher": "林婷",
+    "class_id": "154005-006-001E-01",
+    "color": 6
+  },
+  {
+    "name": "电工电子学（Ⅲ）",
+    "weeks": [
+      9
+    ],
+    "day": 2,
+    "start": 6,
+    "end": 7,
+    "location": "电子技术基础实验室3-DS1325",
+    "teacher": "林婷",
+    "class_id": "154005-006-001E-01",
+    "color": 6
+  },
+  {
+    "name": "电工电子学（Ⅲ）",
+    "weeks": [
+      10
+    ],
+    "day": 2,
+    "start": 6,
+    "end": 7,
+    "location": "电子技术基础实验室3-DS1325",
+    "teacher": "林婷",
+    "class_id": "154005-006-001E-01",
+    "color": 6
+  },
+  {
+    "name": "电工电子学（Ⅲ）",
+    "weeks": [
+      11
+    ],
+    "day": 2,
+    "start": 6,
+    "end": 7,
+    "location": "电子技术基础实验室3-DS1325",
+    "teacher": "林婷",
+    "class_id": "154005-006-001E-01",
+    "color": 6
+  },
+  {
+    "name": "电工电子学（Ⅲ）",
+    "weeks": [
+      12
+    ],
+    "day": 2,
+    "start": 6,
+    "end": 7,
+    "location": "电子技术基础实验室3-DS1325",
+    "teacher": "林婷",
+    "class_id": "154005-006-001E-01",
+    "color": 6
+  },
+  {
+    "name": "体育自选项目（散打2）",
+    "weeks": [
+      1,
+      2,
+      3,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18
+    ],
+    "day": 3,
+    "start": 3,
+    "end": 4,
+    "location": "D东大门",
+    "teacher": "马俊",
+    "class_id": "991834-012",
+    "color": 5
+  },
+  {
+    "name": "人机互动：学术英语读写",
+    "weeks": [
+      1,
+      2,
+      3,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18
+    ],
+    "day": 3,
+    "start": 1,
+    "end": 2,
+    "location": "D1314",
+    "teacher": "黎虹伶",
+    "class_id": "994487-622",
+    "color": 6
   }
 ];

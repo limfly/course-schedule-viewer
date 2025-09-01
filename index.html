@@ -5,49 +5,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>课表查看器</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <!-- 导航栏 -->
+        <!-- 头部 -->
         <header class="header">
-            <button class="back-btn" aria-label="返回"><i class="ri-arrow-left-s-line"></i></button>
             <h1>课程表</h1>
-            <div class="header-actions">
-                <button id="settings-btn" class="action-btn" aria-label="更多选项">
-                    <i class="ri-more-2-fill"></i>
-                </button>
-            </div>
+            <button id="settings-btn" class="action-btn" aria-label="设置">
+                <i class="ri-settings-3-line"></i>
+            </button>
         </header>
 
-        <!-- 周数导航 -->
+        <!-- 周数选择 -->
         <nav class="week-nav">
-            <div class="week-selector">
-                <button class="nav-btn" id="prev-week"><i class="ri-arrow-left-s-line"></i></button>
-                <span class="current-week">第 <span id="current-week">15</span> 周</span>
-                <button class="nav-btn" id="next-week"><i class="ri-arrow-right-s-line"></i></button>
-            </div>
-            <div class="date-range">
-                <span class="date">05日</span>
-                <span class="separator">-</span>
-                <span class="date">31日</span>
-            </div>
+            <button class="nav-btn" id="prev-week"><i class="ri-arrow-left-s-line"></i></button>
+            <span class="current-week">第 <span id="week-number">1</span> 周</span>
+            <button class="nav-btn" id="next-week"><i class="ri-arrow-right-s-line"></i></button>
         </nav>
 
-        <!-- 日期导航 -->
-        <div class="day-nav">
-            <div class="day-item" data-day="一">
-                <span class="day-name">周一</span>
-                <span class="day-date">25日</span>
+        <!-- 课表主体 -->
+        <div class="schedule-container">
+            <!-- 表头 -->
+            <div class="schedule-header">
+                <div class="time-col">节次</div>
+                <div class="day-col">周一</div>
+                <div class="day-col">周二</div>
+                <div class="day-col">周三</div>
+                <div class="day-col">周四</div>
+                <div class="day-col">周五</div>
+                <div class="day-col">周六</div>
+                <div class="day-col">周日</div>
             </div>
-            <div class="day-item" data-day="二">
-                <span class="day-name">周二</span>
-                <span class="day-date">26日</span>
-            </div>
-            <div class="day-item" data-day="三">
-                <span class="day-name">周三</span>
-                <span class="day-date">27日</span>
+
+            <!-- 课表内容 -->
+            <div id="schedule-content"></div>
             </div>
             <div class="day-item" data-day="四">
                 <span class="day-name">周四</span>
