@@ -6,114 +6,167 @@
     <title>课表查看器</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <!-- 简化的头部：只保留周数显示 -->
+        <!-- 导航栏 -->
         <header class="header">
-            <h1>课表</h1>
-            <div class="header-week">第 <span id="current-week">15</span> 周</div>
-            <button id="settings-btn" class="header-settings" aria-label="设置">⚙️</button>
+            <button class="back-btn" aria-label="返回"><i class="ri-arrow-left-s-line"></i></button>
+            <h1>课程表</h1>
+            <div class="header-actions">
+                <button id="settings-btn" class="action-btn" aria-label="更多选项">
+                    <i class="ri-more-2-fill"></i>
+                </button>
+            </div>
         </header>
 
-        <!-- 课表主体 -->
-        <main class="schedule-container">
-            <div class="weekday-tabs">
-                <button class="weekday-tab active" data-weekday="一">周一</button>
-                <button class="weekday-tab" data-weekday="二">周二</button>
-                <button class="weekday-tab" data-weekday="三">周三</button>
-                <button class="weekday-tab" data-weekday="四">周四</button>
-                <button class="weekday-tab" data-weekday="五">周五</button>
-                <button class="weekday-tab" data-weekday="六">周六</button>
-                <button class="weekday-tab" data-weekday="日">周日</button>
+        <!-- 周数导航 -->
+        <nav class="week-nav">
+            <div class="week-selector">
+                <button class="nav-btn" id="prev-week"><i class="ri-arrow-left-s-line"></i></button>
+                <span class="current-week">第 <span id="current-week">15</span> 周</span>
+                <button class="nav-btn" id="next-week"><i class="ri-arrow-right-s-line"></i></button>
             </div>
-            
+            <div class="date-range">
+                <span class="date">05日</span>
+                <span class="separator">-</span>
+                <span class="date">31日</span>
+            </div>
+        </nav>
+
+        <!-- 日期导航 -->
+        <div class="day-nav">
+            <div class="day-item" data-day="一">
+                <span class="day-name">周一</span>
+                <span class="day-date">25日</span>
+            </div>
+            <div class="day-item" data-day="二">
+                <span class="day-name">周二</span>
+                <span class="day-date">26日</span>
+            </div>
+            <div class="day-item" data-day="三">
+                <span class="day-name">周三</span>
+                <span class="day-date">27日</span>
+            </div>
+            <div class="day-item" data-day="四">
+                <span class="day-name">周四</span>
+                <span class="day-date">28日</span>
+            </div>
+            <div class="day-item" data-day="五">
+                <span class="day-name">周五</span>
+                <span class="day-date">29日</span>
+            </div>
+            <div class="day-item" data-day="六">
+                <span class="day-name">周六</span>
+                <span class="day-date">30日</span>
+            </div>
+            <div class="day-item" data-day="日">
+                <span class="day-name">周日</span>
+                <span class="day-date">31日</span>
+            </div>
+        </div>
+
+        <!-- 课程表主体 -->
+        <main class="schedule-container">
             <div id="courses-display" class="courses-display">
-                <!-- 课程卡片区域 -->
+                <!-- 课程卡片将在这里动态生成 -->
             </div>
         </main>
 
-        <!-- 设置面板：集成所有功能性控件 -->
+        <!-- 设置面板 -->
         <aside id="settings-panel" class="settings-panel" aria-hidden="true">
-            <div class="settings-inner">
-                <header class="settings-header">
-                    <h3>设置</h3>
-                    <button id="close-settings" class="close-btn">×</button>
-                </header>
+            <header class="settings-header">
+                <h2>设置</h2>
+                <button id="close-settings" class="close-settings">
+                    <i class="ri-close-line"></i>
+                </button>
+            </header>
 
-                <div class="settings-content">
-                    <!-- 周次选择器 -->
-                    <section class="settings-section">
-                        <h4>周次选择</h4>
-                        <div class="week-controls">
-                            <button id="prev-week" class="btn">◄</button>
-                            <select id="week-select"></select>
-                            <button id="next-week" class="btn">►</button>
-                            <button id="current-week-btn" class="btn">本周</button>
-                        </div>
-                        <button id="set-start-date" class="btn">设置学期起始日期</button>
-                    </section>
+            <div class="settings-content">
+                <!-- 课表管理 -->
+                <section class="settings-section">
+                    <h3>课表管理</h3>
+                    <div class="section-content">
+                        <button class="setting-btn" id="import-btn">
+                            <i class="ri-upload-2-line"></i>
+                            <span>导入课表</span>
+                        </button>
+                        <button class="setting-btn" id="export-btn">
+                            <i class="ri-download-2-line"></i>
+                            <span>导出数据</span>
+                        </button>
+                        <input type="file" id="file-input" accept=".xlsx,.xls,.csv,.json" style="display: none;">
+                    </div>
+                </section>
 
-                    <!-- 视图设置 -->
-                    <section class="settings-section">
-                        <h4>视图设置</h4>
-                        <div class="view-controls">
-                            <div class="view-mode">
-                                <label>课表视图：</label>
-                                <div class="btn-group">
-                                    <button id="day-view-btn" class="btn active">日视图</button>
-                                    <button id="week-view-btn" class="btn">周视图</button>
-                                </div>
-                            </div>
-                            <div class="mobile-view">
-                                <label>移动端显示：</label>
-                                <select id="compact-toggle">
-                                    <option value="compact">紧凑一屏</option>
-                                    <option value="scroll">卡片滚动</option>
-                                </select>
+                <!-- 显示偏好 -->
+                <section class="settings-section">
+                    <h3>显示偏好</h3>
+                    <div class="section-content">
+                        <div class="setting-item">
+                            <label>显示模式</label>
+                            <div class="toggle-group">
+                                <button class="toggle-btn active" id="day-view-btn">日视图</button>
+                                <button class="toggle-btn" id="week-view-btn">周视图</button>
                             </div>
                         </div>
-                    </section>
-
-                    <!-- 搜索功能 -->
-                    <section class="settings-section">
-                        <h4>搜索课程</h4>
-                        <div class="search-box">
-                            <input type="text" id="search-input" placeholder="搜索课程名称...">
-                            <div class="search-buttons">
-                                <button id="search-btn" class="btn">搜索</button>
-                                <button id="clear-search" class="btn">清除</button>
-                            </div>
+                        <div class="setting-item">
+                            <label>移动端布局</label>
+                            <select id="compact-toggle" class="select-input">
+                                <option value="compact">紧凑一屏</option>
+                                <option value="scroll">卡片滚动</option>
+                            </select>
                         </div>
-                    </section>
+                    </div>
+                </section>
 
-                    <!-- 数据管理 -->
-                    <section class="settings-section">
-                        <h4>数据管理</h4>
-                        <div class="data-controls">
-                            <button id="import-btn" class="btn">导入课表</button>
-                            <input type="file" id="file-input" accept=".xlsx,.xls,.csv,.json,.txt,image/*" style="display:none">
-                            <div class="export-group">
-                                <button id="export-json" class="btn">导出 JSON</button>
-                                <button id="export-excel" class="btn">导出 Excel</button>
-                            </div>
+                <!-- 搜索功能 -->
+                <section class="settings-section">
+                    <h3>搜索课程</h3>
+                    <div class="search-box">
+                        <div class="search-input-wrap">
+                            <i class="ri-search-line"></i>
+                            <input type="text" id="search-input" placeholder="搜索课程名称、教师或教室...">
                         </div>
-                    </section>
+                        <div class="search-results" id="search-results"></div>
+                    </div>
+                </section>
 
-                    <!-- 高级设置 -->
-                    <section class="settings-section">
-                        <h4>高级设置</h4>
-                        <div class="proxy-settings">
-                            <label>AI 代理地址：</label>
-                            <input type="text" id="proxy-url-input" placeholder="https://your-app.vercel.app">
-                            <button id="save-proxy-btn" class="btn">保存</button>
+                <!-- 时间设置 -->
+                <section class="settings-section">
+                    <h3>时间设置</h3>
+                    <div class="section-content">
+                        <div class="setting-item">
+                            <label>学期开始日期</label>
+                            <input type="date" id="semester-start" class="date-input">
                         </div>
-                    </section>
-                </div>
+                        <button class="setting-btn" id="set-current-week">
+                            <i class="ri-calendar-check-line"></i>
+                            <span>设为当前周</span>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- 高级设置 -->
+                <section class="settings-section">
+                    <h3>高级设置</h3>
+                    <div class="section-content">
+                        <div class="setting-item">
+                            <label>AI 代理服务</label>
+                            <input type="text" 
+                                   id="proxy-url-input" 
+                                   class="text-input" 
+                                   placeholder="https://your-proxy.com">
+                        </div>
+                        <button class="setting-btn" id="save-proxy-btn">
+                            <i class="ri-save-line"></i>
+                            <span>保存设置</span>
+                        </button>
+                    </div>
+                </section>
             </div>
-        </aside>
-
-        <!-- 课表显示区 -->
+        </aside>        <!-- 课表显示区 -->
         <div id="schedule-container" class="schedule-container">
             <div class="week-info">
                 <h2 id="week-title">第 1 周 课程安排</h2>
