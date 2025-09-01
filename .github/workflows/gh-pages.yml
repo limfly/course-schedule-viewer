@@ -17,19 +17,38 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node (for optional tools)
+      - name: Setup Node (optional)
         uses: actions/setup-node@v4
         with:
           node-version: '18'
 
-      - name: Build site (no build step for pure static)
+      - name: Debug: list repository root
         run: |
-          echo "No build step required for this static site"
+          echo "Repository root files:" 
+          ls -la || true
+          echo "Listing .github:" 
+          ls -la .github || true
+
+      - name: Prepare public/ directory with static assets
+        run: |
+          mkdir -p public
+          # copy common static files if present; tolerate missing files
+          cp -v index.html public/ 2>/dev/null || true
+          cp -v style.css public/ 2>/dev/null || true
+          cp -v courses_data.js public/ 2>/dev/null || true
+          cp -v app.js public/ 2>/dev/null || true
+          cp -v *.html public/ 2>/dev/null || true
+          cp -v *.css public/ 2>/dev/null || true
+          cp -v *.js public/ 2>/dev/null || true
+          # copy assets and docs if they exist
+          if [ -d "docs" ]; then cp -r docs public/docs; fi
+          if [ -d "api" ]; then cp -r api public/api; fi
+          echo "public content:" && ls -la public || true
 
       - name: Upload artifact for GitHub Pages
         uses: actions/upload-pages-artifact@v1
         with:
-          path: '.'
+          path: public
 
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v1
